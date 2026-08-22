@@ -1,0 +1,156 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+model Settings {
+  id           Int      @id @default(1)
+  weightUnit   String   @default("grain") // "grain" | "gram"
+  lengthUnit   String   @default("mm")    // "mm" | "in"
+  velocityUnit String   @default("mps")   // "mps" | "fps"
+  updatedAt    DateTime @updatedAt
+}
+
+model Firearm {
+  id          String    @id @default(cuid())
+  name        String
+  caliber     String
+  barrelLenMm Float?
+  twistRate   String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  loads       Load[]
+  sessions    Session[]
+}
+
+model Load {
+  id             String        @id @default(cuid())
+  // Defaults only exist to backfill pre-existing rows during migration —
+  // application code always supplies both explicitly on every create.
+  loadNumber     Int           @default(1)
+  variantLetter  String        @default("A")
+  name           String?
+  firearmId      String
+  firearm        Firearm       @relation(fields: [firearmId], references: [id], onDelete: Cascade)
+  caseBrand      String?
+  caseLoadCount  Int?
+  sizingDie      String?
+  shoulderBumpMm Float?
+  bushingDiameterMm Float?
+  mandrelDiameterMm Float?
+  primer         String?
+  powder         String?
+  chargeGrains   Float
+  bullet         String?
+  bulletWeightGr Float?
+  oalMm          Float?
+  cbtoMm         Float?
+  crimpInfo      String?
+  notes          String?
+  parentLoadId   String?
+  parentLoad     Load?         @relation("LoadVariants", fields: [parentLoadId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variants       Load[]        @relation("LoadVariants")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  sessionLoads   SessionLoad[]
+  shotGroups     ShotGroup[]
+
+  @@unique([loadNumber, variantLetter])
+  @@index([firearmId])
+  @@index([parentLoadId])
+}
+
+model Session {
+  id           String        @id @default(cuid())
+  date         DateTime
+  location     String?
+  tempC        Float?
+  pressureHPa  Float?
+  humidityPct  Float?
+  distanceM    Float?
+  firearmId    String?
+  firearm      Firearm?      @relation(fields: [firearmId], references: [id], onDelete: SetNull)
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  sessionLoads SessionLoad[]
+  groups       ShotGroup[]
+
+  @@index([firearmId])
+}
+
+model SessionLoad {
+  id        String  @id @default(cuid())
+  sessionId String
+  loadId    String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  load      Load    @relation(fields: [loadId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, loadId])
+}
+
+model ShotGroup {
+  id              String       @id @default(cuid())
+  sessionId       String
+  session         Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  loadId          String?
+  load            Load?        @relation(fields: [loadId], references: [id], onDelete: SetNull)
+  distanceM       Float?
+  extremeSpreadMm Float?
+  meanRadiusMm    Float?
+  shotCount       Int?
+  source          String        @default("manual") // "manual" | "calibrated"
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  images          GroupImage[]
+  velocitySets    VelocitySet[]
+
+  @@index([sessionId])
+  @@index([loadId])
+}
+
+model GroupImage {
+  id          String    @id @default(cuid())
+  groupId     String
+  group       ShotGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  filePath    String
+  width       Int?
+  height      Int?
+  calibration String?   // JSON: {p1:{x,y}, p2:{x,y}, realDistanceMm}
+  shotPoints  String?   // JSON: [{x,y}, ...]
+  createdAt   DateTime  @default(now())
+
+  @@index([groupId])
+}
+
+model VelocitySet {
+  id           String         @id @default(cuid())
+  groupId      String
+  group        ShotGroup      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  sourceDevice String
+  rawFileName  String?
+  importedAt   DateTime       @default(now())
+  avgMps       Float?
+  sdMps        Float?
+  esMps        Float?
+  shots        VelocityShot[]
+
+  @@index([groupId])
+}
+
+model VelocityShot {
+  id            String      @id @default(cuid())
+  velocitySetId String
+  velocitySet   VelocitySet @relation(fields: [velocitySetId], references: [id], onDelete: Cascade)
+  shotNumber    Int
+  velocityMps   Float
+
+  @@index([velocitySetId])
+}

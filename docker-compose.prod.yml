@@ -1,0 +1,34 @@
+# Production overlay for a Linux host with a containerized reverse proxy in
+# front (Traefik, Caddy, nginx-proxy, …). Apply on top of the base file:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Requires DOMAIN set (e.g. in a ".env" next to this file: DOMAIN=wiederladen.example.com)
+# and the external network your reverse proxy stack attaches to — create it once with:
+#
+#   docker network create proxy
+#
+# (skip that if your proxy stack already defines/creates the "proxy" network itself).
+services:
+  app:
+    # No host port published here (docker-compose.override.yml, which adds
+    # one for local dev, is only auto-loaded when no -f flags are given) — the
+    # reverse proxy reaches this service by name ("app", port 3000) over the
+    # shared "proxy" network instead. Traefik example labels below; for
+    # Caddy/nginx-proxy, point their config at http://app:3000 on the same
+    # network instead of these labels.
+    environment:
+      - ALLOWED_ORIGIN=${DOMAIN}
+    networks:
+      - proxy
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wiederladen.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.wiederladen.entrypoints=websecure"
+      - "traefik.http.routers.wiederladen.tls.certresolver=letsencrypt"
+      - "traefik.http.services.wiederladen.loadbalancer.server.port=3000"
+
+networks:
+  proxy:
+    external: true

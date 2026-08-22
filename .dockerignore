@@ -1,0 +1,12 @@
+node_modules
+.next
+data
+chrono
+.env
+.env.local
+npm-debug.log*
+.git
+.gitignore
+README.md
+*.md
+.vscode
