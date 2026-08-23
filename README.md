@@ -40,45 +40,40 @@ es aber auch, den gesamten `data`-Ordner zu kopieren. Über **Backup wiederherst
 eine heruntergeladene Datenbank-Backup-Datei auch wieder einspielen (legt vorher automatisch eine
 Sicherheitskopie der aktuellen Datenbank an; die App startet danach kurz neu).
 
-## Produktions-Deployment (Linux-Server + Reverse Proxy)
+## Produktions-Deployment (Linux-Server + Reverse Proxy auf anderem Host)
 
-Für einen Linux-Server, der über einen Reverse Proxy (der selbst als Docker-Container läuft, z.B.
-Traefik/Caddy/nginx-proxy) aus dem Internet erreichbar ist — die Zugangskontrolle (Benutzername/
-Passwort) übernimmt dabei der Reverse Proxy, nicht die App:
+Setup: App läuft auf einem internen Linux-Host, ein Reverse Proxy auf einem anderen Host im
+selben internen Netzwerk übernimmt die Zugangskontrolle (Benutzername/Passwort) und ist als
+einziger der beiden Hosts vom Internet aus erreichbar.
 
 1. Repository klonen:
 
    ```
-   git clone <repo-url> wiederladen-app
+   git clone https://github.com/stm79/wiederladen-app.git
    cd wiederladen-app
    ```
 
-2. `.env` anlegen (kopieren von `.env.example`) und `DOMAIN` auf den echten Domainnamen setzen,
-   z.B. `DOMAIN=wiederladen.example.com`.
+2. `.env` anlegen (kopieren von `.env.example`) und `DOMAIN` auf den echten, öffentlichen
+   Domainnamen setzen, unter dem der Reverse Proxy die App ausliefert, z.B.
+   `DOMAIN=wiederladen.example.com`. Das ist nötig, damit Next.js' eingebaute CSRF-Prüfung für
+   Server Actions Anfragen von dieser Domain akzeptiert — ohne das schlagen Formulare hinter dem
+   Proxy mit "Invalid Server Action request" fehl.
 
-3. Falls noch nicht vorhanden, das von deinem Reverse-Proxy-Stack verwendete externe
-   Docker-Netzwerk anlegen (Name muss zu dem in `docker-compose.prod.yml` passen, per Default
-   `proxy`):
-
-   ```
-   docker network create proxy
-   ```
-
-4. Starten:
+3. Starten:
 
    ```
-   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+   docker compose up -d --build
    ```
 
-`docker-compose.prod.yml` veröffentlicht **keinen** Port auf dem Host mehr — die App ist nur noch
-über das gemeinsame `proxy`-Netzwerk für den Reverse Proxy erreichbar (Service-Name `app`, Port
-`3000`). Es enthält beispielhafte Traefik-Labels; bei Caddy/nginx-proxy stattdessen deren
-Konfiguration auf `http://app:3000` im selben Netzwerk zeigen lassen.
+   Das veröffentlicht Port 3000 auf dem App-Host (im internen Netz, nicht am Internet), genau wie
+   im lokalen Setup oben.
 
-`ALLOWED_ORIGIN` (aus `DOMAIN` abgeleitet) sorgt dafür, dass Next.js' eingebaute CSRF-Prüfung für
-Server Actions Anfragen von der echten Domain akzeptiert.
+4. Auf dem Reverse-Proxy-Host die App als Backend eintragen: `http://<interne-IP-des-App-Hosts>:3000`.
+   Der Proxy muss den ursprünglichen `Host`-Header (die öffentliche Domain) beim Weiterleiten
+   erhalten bzw. per `X-Forwarded-Host` durchreichen — das ist bei Caddy/Traefik/nginx-proxy
+   standardmäßig der Fall.
 
-Updates einspielen: erneut `git pull`, dann Schritt 4 wiederholen (`--build` sorgt für Neubau bei
+Updates einspielen: `git pull`, dann Schritt 3 wiederholen (`--build` sorgt für Neubau bei
 Codeänderungen; Migrationen laufen beim Start automatisch).
 
 ## Entwicklung ohne Docker
