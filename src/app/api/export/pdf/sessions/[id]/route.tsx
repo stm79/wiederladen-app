@@ -38,7 +38,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         date: session.date,
         location: session.location,
         firearmName: session.firearm?.name ?? null,
-        distanceM: session.distanceM,
         tempC: session.tempC,
         pressureHPa: session.pressureHPa,
         humidityPct: session.humidityPct,

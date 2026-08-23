@@ -25,7 +25,6 @@ export interface SessionReportData {
   date: Date;
   location: string | null;
   firearmName: string | null;
-  distanceM: number | null;
   tempC: number | null;
   pressureHPa: number | null;
   humidityPct: number | null;
@@ -54,7 +53,6 @@ export function SessionReportDocument({ session, prefs }: { session: SessionRepo
         </Text>
 
         <Text style={s.sectionTitle}>Bedingungen</Text>
-        <Row label="Distanz" value={session.distanceM != null ? `${session.distanceM} m` : "—"} />
         <Row label="Temperatur" value={session.tempC != null ? `${session.tempC} °C` : "—"} />
         <Row label="Luftdruck" value={session.pressureHPa != null ? `${session.pressureHPa} hPa` : "—"} />
         <Row label="Luftfeuchtigkeit" value={session.humidityPct != null ? `${session.humidityPct} %` : "—"} />
@@ -66,6 +64,7 @@ export function SessionReportDocument({ session, prefs }: { session: SessionRepo
             <View style={s.table}>
               <View style={s.tableHeaderRow}>
                 <Text style={s.tableCell}>Ladung</Text>
+                <Text style={s.tableCell}>Distanz</Text>
                 <Text style={s.tableCell}>Extreme Spread</Text>
                 <Text style={s.tableCell}>Mean Radius</Text>
                 <Text style={s.tableCell}>Schuss</Text>
@@ -73,6 +72,7 @@ export function SessionReportDocument({ session, prefs }: { session: SessionRepo
               {session.groups.map((g, i) => (
                 <View key={i} style={s.tableRow}>
                   <Text style={s.tableCell}>{g.loadLabel}</Text>
+                  <Text style={s.tableCell}>{g.distanceM != null ? `${g.distanceM} m` : "—"}</Text>
                   <Text style={s.tableCell}>{fmt("length", g.extremeSpreadMm, prefs, 1)}</Text>
                   <Text style={s.tableCell}>{fmt("length", g.meanRadiusMm, prefs, 1)}</Text>
                   <Text style={s.tableCell}>{g.shotCount ?? "—"}</Text>

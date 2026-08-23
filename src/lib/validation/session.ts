@@ -6,7 +6,6 @@ export const sessionSchema = z.object({
   tempC: z.number().nullable().optional(),
   pressureHPa: z.number().nullable().optional(),
   humidityPct: z.number().min(0).max(100).nullable().optional(),
-  distanceM: z.number().positive().nullable().optional(),
   firearmId: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
   loadIds: z.array(z.string()),

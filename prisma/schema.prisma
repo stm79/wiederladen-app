@@ -74,7 +74,6 @@ model Session {
   tempC        Float?
   pressureHPa  Float?
   humidityPct  Float?
-  distanceM    Float?
   firearmId    String?
   firearm      Firearm?      @relation(fields: [firearmId], references: [id], onDelete: SetNull)
   notes        String?

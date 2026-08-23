@@ -12,7 +12,6 @@ export async function GET() {
     datum: s.date.toISOString().slice(0, 10),
     ort: s.location ?? "",
     waffe: s.firearm?.name ?? "",
-    distanzM: s.distanceM ?? "",
     temperaturC: s.tempC ?? "",
     luftdruckHPa: s.pressureHPa ?? "",
     luftfeuchtigkeitPct: s.humidityPct ?? "",

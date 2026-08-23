@@ -27,7 +27,6 @@ interface SessionFormProps {
     tempC: number | null;
     pressureHPa: number | null;
     humidityPct: number | null;
-    distanceM: number | null;
     firearmId: string | null;
     notes: string | null;
     sessionLoads: { loadId: string }[];
@@ -57,7 +56,6 @@ export function SessionForm({ firearms, loads, session }: SessionFormProps) {
           tempC: session.tempC,
           pressureHPa: session.pressureHPa,
           humidityPct: session.humidityPct,
-          distanceM: session.distanceM,
           firearmId: session.firearmId,
           notes: session.notes,
           loadIds: session.sessionLoads.map((sl) => sl.loadId),
@@ -68,7 +66,6 @@ export function SessionForm({ firearms, loads, session }: SessionFormProps) {
           tempC: null,
           pressureHPa: null,
           humidityPct: null,
-          distanceM: null,
           firearmId: null,
           notes: "",
           loadIds: [],
@@ -118,24 +115,6 @@ export function SessionForm({ firearms, loads, session }: SessionFormProps) {
               </option>
             ))}
           </select>
-        </FormField>
-
-        <FormField label="Distanz (m)" htmlFor="distanceM">
-          <Controller
-            control={control}
-            name="distanceM"
-            render={({ field }) => (
-              <input
-                id="distanceM"
-                type="number"
-                step="any"
-                inputMode="decimal"
-                className={inputClass}
-                value={field.value ?? ""}
-                onChange={(e) => field.onChange(e.target.value === "" ? null : Number(e.target.value))}
-              />
-            )}
-          />
         </FormField>
 
         <FormField label="Temperatur (°C)" htmlFor="tempC">
