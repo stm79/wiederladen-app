@@ -19,6 +19,8 @@ export default async function ComparePage() {
     buildComparisonRow({
       id: load.id,
       name: load.name,
+      loadNumber: load.loadNumber,
+      variantLetter: load.variantLetter,
       firearmId: load.firearmId,
       firearmName: load.firearm.name,
       caliber: load.firearm.caliber,

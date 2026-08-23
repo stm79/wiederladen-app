@@ -24,6 +24,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const aggregate = buildComparisonRow({
     id: load.id,
     name: load.name,
+    loadNumber: load.loadNumber,
+    variantLetter: load.variantLetter,
     firearmId: load.firearmId,
     firearmName: load.firearm.name,
     caliber: load.firearm.caliber,

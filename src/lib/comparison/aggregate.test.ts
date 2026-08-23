@@ -5,6 +5,8 @@ function baseLoad(overrides: Partial<LoadForComparison> = {}): LoadForComparison
   return {
     id: "l1",
     name: null,
+    loadNumber: 3,
+    variantLetter: "A",
     firearmId: "f1",
     firearmName: "Test Rifle",
     caliber: ".308 Win",
@@ -41,11 +43,17 @@ describe("buildComparisonRow", () => {
     expect(row.meanExtremeSpreadMm).toBeNull();
   });
 
-  it("falls back to caliber + bullet weight + bullet when no name is set", () => {
-    expect(buildComparisonRow(baseLoad({ name: "Stufe 3" })).loadLabel).toBe("Stufe 3");
-    expect(buildComparisonRow(baseLoad({ name: null })).loadLabel).toBe(".308 Win 168gr MatchKing");
+  it("prefixes the load number, falling back to caliber + bullet weight + bullet when no name is set", () => {
+    expect(buildComparisonRow(baseLoad({ name: "Stufe 3" })).loadLabel).toBe("#003A Stufe 3");
+    expect(buildComparisonRow(baseLoad({ name: null })).loadLabel).toBe("#003A .308 Win 168gr MatchKing");
     expect(
       buildComparisonRow(baseLoad({ name: null, caliber: ".308 Win", bulletWeightGr: null, bullet: null })).loadLabel
-    ).toBe(".308 Win");
+    ).toBe("#003A .308 Win");
+  });
+
+  it("distinguishes otherwise-identical loads (same caliber/weight/bullet) by load number", () => {
+    const a = buildComparisonRow(baseLoad({ name: null, loadNumber: 1, chargeGrains: 41 }));
+    const b = buildComparisonRow(baseLoad({ name: null, loadNumber: 2, chargeGrains: 42 }));
+    expect(a.loadLabel).not.toBe(b.loadLabel);
   });
 });

@@ -1,5 +1,6 @@
 import { computeVelocityStats } from "@/lib/stats/velocity-stats";
 import { loadDisplayName } from "@/lib/loads/label";
+import { formatLoadNumber } from "@/lib/loads/variant-letter";
 
 export interface LoadComparisonRow {
   loadId: string;
@@ -23,6 +24,8 @@ export interface LoadComparisonRow {
 export interface LoadForComparison {
   id: string;
   name: string | null;
+  loadNumber: number;
+  variantLetter: string;
   firearmId: string;
   firearmName: string;
   caliber: string;
@@ -43,7 +46,7 @@ export function buildComparisonRow(load: LoadForComparison): LoadComparisonRow {
 
   return {
     loadId: load.id,
-    loadLabel: loadDisplayName(load),
+    loadLabel: `${formatLoadNumber(load.loadNumber, load.variantLetter)} ${loadDisplayName(load)}`,
     firearmId: load.firearmId,
     firearmName: load.firearmName,
     caliber: load.caliber,
