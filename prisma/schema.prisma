@@ -61,10 +61,33 @@ model Load {
   updatedAt      DateTime      @updatedAt
   sessionLoads   SessionLoad[]
   shotGroups     ShotGroup[]
+  checklistChecks LoadChecklistCheck[]
 
   @@unique([loadNumber, variantLetter])
   @@index([firearmId])
   @@index([parentLoadId])
+}
+
+model ChecklistStep {
+  id        String   @id @default(cuid())
+  label     String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  checks    LoadChecklistCheck[]
+}
+
+// A row's presence means "checked" — no row means unchecked. That way a
+// newly added step automatically shows as unchecked on every existing load
+// without a backfill, and unchecking is just deleting the row.
+model LoadChecklistCheck {
+  id        String        @id @default(cuid())
+  loadId    String
+  load      Load          @relation(fields: [loadId], references: [id], onDelete: Cascade)
+  stepId    String
+  step      ChecklistStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  checkedAt DateTime      @default(now())
+
+  @@unique([loadId, stepId])
 }
 
 model Session {

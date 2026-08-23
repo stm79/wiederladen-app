@@ -6,6 +6,7 @@ import { DeleteButton } from "@/components/ui/DeleteButton";
 import { DuplicateButton } from "@/components/ui/DuplicateButton";
 import { Button } from "@/components/ui/Button";
 import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
+import { LoadChecklist } from "@/components/loads/LoadChecklist";
 import { deleteLoad } from "@/app/actions/loads";
 import { getDistinctLoadFieldValues } from "@/lib/loads/distinct-values";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
@@ -17,17 +18,19 @@ export default async function LoadDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [load, firearms, known] = await Promise.all([
+  const [load, firearms, known, checklistSteps] = await Promise.all([
     prisma.load.findUnique({
       where: { id },
       include: {
         parentLoad: { include: { firearm: { select: { caliber: true } } } },
         variants: { orderBy: { createdAt: "desc" }, include: { firearm: { select: { caliber: true } } } },
         shotGroups: { include: { session: true }, orderBy: { createdAt: "desc" } },
+        checklistChecks: true,
       },
     }),
     prisma.firearm.findMany({ orderBy: { name: "asc" } }),
     getDistinctLoadFieldValues(),
+    prisma.checklistStep.findMany({ orderBy: { sortOrder: "asc" } }),
   ]);
 
   if (!load) notFound();
@@ -73,6 +76,12 @@ export default async function LoadDetailPage({
           />
         </div>
       </div>
+
+      <LoadChecklist
+        loadId={load.id}
+        steps={checklistSteps}
+        checkedStepIds={load.checklistChecks.map((c) => c.stepId)}
+      />
 
       {load.shotGroups.length > 0 && (
         <div>
