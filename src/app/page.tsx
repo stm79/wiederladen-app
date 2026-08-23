@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { loadDisplayName } from "@/lib/loads/label";
 
 // Aggregates counts across entities touched by every phase's mutations;
 // simpler to always render fresh than to wire revalidatePath("/") into each one.
@@ -23,7 +24,12 @@ async function getRecentLoads() {
 
   return loads.map((load) => ({
     id: load.id,
-    label: load.name ?? (load.powder || "Ladung"),
+    label: loadDisplayName({
+      name: load.name,
+      caliber: load.firearm.caliber,
+      bulletWeightGr: load.bulletWeightGr,
+      bullet: load.bullet,
+    }),
     firearmName: load.firearm.name,
   }));
 }

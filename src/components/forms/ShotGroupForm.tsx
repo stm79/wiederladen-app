@@ -9,10 +9,11 @@ import { createShotGroup, updateShotGroupManual } from "@/app/actions/groups";
 import { FormField, inputClass } from "@/components/forms/FormField";
 import { UnitValueInput } from "@/components/units/UnitValueInput";
 import { Button } from "@/components/ui/Button";
+import { loadDisplayName } from "@/lib/loads/label";
 
 interface ShotGroupFormProps {
   sessionId: string;
-  loads: { id: string; name: string | null; powder: string | null }[];
+  loads: { id: string; name: string | null; caliber: string; bulletWeightGr: number | null; bullet: string | null }[];
   group?: {
     id: string;
     loadId: string | null;
@@ -72,7 +73,7 @@ export function ShotGroupForm({ sessionId, loads, group, onDone }: ShotGroupForm
             <option value="">— keine —</option>
             {loads.map((load) => (
               <option key={load.id} value={load.id}>
-                {load.name ?? (load.powder || "Ladung")}
+                {loadDisplayName(load)}
               </option>
             ))}
           </select>

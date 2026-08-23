@@ -33,7 +33,7 @@ interface GroupCardProps {
     }[];
   };
   loadLabel: string | null;
-  loads: { id: string; name: string | null; powder: string | null }[];
+  loads: { id: string; name: string | null; caliber: string; bulletWeightGr: number | null; bullet: string | null }[];
 }
 
 export function GroupCard({ sessionId, group, loadLabel, loads }: GroupCardProps) {

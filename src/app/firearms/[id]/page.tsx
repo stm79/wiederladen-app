@@ -7,6 +7,7 @@ import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
 import { LadderChart } from "@/components/charts/LadderChart";
 import { deleteFirearm } from "@/app/actions/firearms";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
+import { loadDisplayName } from "@/lib/loads/label";
 
 export default async function FirearmDetailPage({
   params,
@@ -79,7 +80,12 @@ export default async function FirearmDetailPage({
                     <span className="mr-2 text-neutral-400 tabular-nums">
                       {formatLoadNumber(load.loadNumber, load.variantLetter)}
                     </span>
-                    {load.name ?? (load.powder || "Ladung")}
+                    {loadDisplayName({
+                      name: load.name,
+                      caliber: firearm.caliber,
+                      bulletWeightGr: load.bulletWeightGr,
+                      bullet: load.bullet,
+                    })}
                   </div>
                   <div className="text-sm text-neutral-500">
                     {load.bulletWeightGr ? load.bullet : null}

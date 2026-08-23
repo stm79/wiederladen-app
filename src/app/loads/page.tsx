@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/Button";
 import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
+import { loadDisplayName } from "@/lib/loads/label";
 
 export const dynamic = "force-dynamic";
 
@@ -53,9 +54,14 @@ export default async function LoadsPage() {
                     <Link
                       href={`/loads/${load.id}`}
                       className="absolute inset-0"
-                      aria-label={`${load.name ?? "Ladung"} bearbeiten`}
+                      aria-label={`${loadDisplayName({ name: load.name, caliber: load.firearm.caliber, bulletWeightGr: load.bulletWeightGr, bullet: load.bullet })} bearbeiten`}
                     />
-                    {load.name ?? "—"}
+                    {loadDisplayName({
+                      name: load.name,
+                      caliber: load.firearm.caliber,
+                      bulletWeightGr: load.bulletWeightGr,
+                      bullet: load.bullet,
+                    })}
                   </td>
                   <td className="py-2 pr-4">{load.firearm.name}</td>
                   <td className="py-2 pr-4">{load.powder || "—"}</td>

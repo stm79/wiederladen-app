@@ -21,6 +21,7 @@ export default async function ComparePage() {
       name: load.name,
       firearmId: load.firearmId,
       firearmName: load.firearm.name,
+      caliber: load.firearm.caliber,
       powder: load.powder,
       chargeGrains: load.chargeGrains,
       bullet: load.bullet,

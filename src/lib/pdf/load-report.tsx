@@ -3,6 +3,7 @@ import type { UnitPreferences } from "@/lib/units/types";
 import { fmt, fmtDateTime } from "./format";
 import { pdfStyles as s } from "./styles";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
+import { loadDisplayName } from "@/lib/loads/label";
 
 export interface LoadReportData {
   loadNumber: number;
@@ -19,6 +20,7 @@ export interface LoadReportData {
   cbtoMm: number | null;
   caseBrand: string | null;
   caseLoadCount: number | null;
+  caseTrimLengthMm: number | null;
   sizingDie: string | null;
   shoulderBumpMm: number | null;
   bushingDiameterMm: number | null;
@@ -46,7 +48,7 @@ export function LoadReportDocument({ load, prefs }: { load: LoadReportData; pref
   return (
     <Document>
       <Page size="A4" style={s.page}>
-        <Text style={s.title}>{load.name ?? load.powder ?? "Ladung"}</Text>
+        <Text style={s.title}>{loadDisplayName(load)}</Text>
         <Text style={s.subtitle}>
           {formatLoadNumber(load.loadNumber, load.variantLetter)} · {load.firearmName} ({load.caliber})
         </Text>
@@ -64,6 +66,7 @@ export function LoadReportDocument({ load, prefs }: { load: LoadReportData; pref
         <Text style={s.sectionTitle}>Hülsenvorbereitung</Text>
         <Row label="Hülse" value={load.caseBrand ?? "—"} />
         <Row label="Load Count" value={load.caseLoadCount != null ? String(load.caseLoadCount) : "—"} />
+        <Row label="Trimmlänge" value={fmt("length", load.caseTrimLengthMm, prefs)} />
         <Row label="Matrize" value={load.sizingDie ?? "—"} />
         <Row label="Shoulder Bump" value={fmt("length", load.shoulderBumpMm, prefs)} />
         <Row label="Bushing" value={fmt("length", load.bushingDiameterMm, prefs)} />

@@ -7,6 +7,7 @@ function baseLoad(overrides: Partial<LoadForComparison> = {}): LoadForComparison
     name: null,
     firearmId: "f1",
     firearmName: "Test Rifle",
+    caliber: ".308 Win",
     powder: "N150",
     chargeGrains: 42,
     bullet: "MatchKing",
@@ -40,9 +41,11 @@ describe("buildComparisonRow", () => {
     expect(row.meanExtremeSpreadMm).toBeNull();
   });
 
-  it("falls back to powder name, then 'Ladung', when no name is set", () => {
+  it("falls back to caliber + bullet weight + bullet when no name is set", () => {
     expect(buildComparisonRow(baseLoad({ name: "Stufe 3" })).loadLabel).toBe("Stufe 3");
-    expect(buildComparisonRow(baseLoad({ name: null, powder: "N150" })).loadLabel).toBe("N150");
-    expect(buildComparisonRow(baseLoad({ name: null, powder: null })).loadLabel).toBe("Ladung");
+    expect(buildComparisonRow(baseLoad({ name: null })).loadLabel).toBe(".308 Win 168gr MatchKing");
+    expect(
+      buildComparisonRow(baseLoad({ name: null, caliber: ".308 Win", bulletWeightGr: null, bullet: null })).loadLabel
+    ).toBe(".308 Win");
   });
 });

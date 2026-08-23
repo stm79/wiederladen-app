@@ -6,6 +6,7 @@ import { AddShotGroupSection } from "@/components/sessions/AddShotGroupSection";
 import { GroupCard } from "@/components/sessions/GroupCard";
 import { Button } from "@/components/ui/Button";
 import { deleteSession } from "@/app/actions/sessions";
+import { loadDisplayName } from "@/lib/loads/label";
 
 export default async function SessionDetailPage({
   params,
@@ -14,11 +15,11 @@ export default async function SessionDetailPage({
 }) {
   const { id } = await params;
 
-  const [session, firearms, allLoads] = await Promise.all([
+  const [session, firearms, allLoadsRaw] = await Promise.all([
     prisma.session.findUnique({
       where: { id },
       include: {
-        sessionLoads: { include: { load: true } },
+        sessionLoads: { include: { load: { include: { firearm: { select: { caliber: true } } } } } },
         groups: {
           include: { images: true, velocitySets: { include: { shots: true }, orderBy: { importedAt: "desc" } } },
           orderBy: { createdAt: "desc" },
@@ -26,17 +27,21 @@ export default async function SessionDetailPage({
       },
     }),
     prisma.firearm.findMany({ orderBy: { name: "asc" } }),
-    prisma.load.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.load.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { firearm: { select: { caliber: true } } },
+    }),
   ]);
 
   if (!session) notFound();
 
-  const sessionLoadOptions = session.sessionLoads.map((sl) => sl.load);
+  const allLoads = allLoadsRaw.map((load) => ({ ...load, caliber: load.firearm.caliber }));
+  const sessionLoadOptions = session.sessionLoads.map((sl) => ({ ...sl.load, caliber: sl.load.firearm.caliber }));
   const loadLabel = (loadId: string | null) => {
     if (!loadId) return null;
     const load = sessionLoadOptions.find((l) => l.id === loadId) ?? allLoads.find((l) => l.id === loadId);
     if (!load) return null;
-    return load.name ?? (load.powder || "Ladung");
+    return loadDisplayName(load);
   };
 
   return (

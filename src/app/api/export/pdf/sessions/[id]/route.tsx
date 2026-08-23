@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUnitPreferences } from "@/lib/settings";
 import { SessionReportDocument } from "@/lib/pdf/session-report";
+import { loadDisplayName } from "@/lib/loads/label";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -11,8 +12,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     where: { id },
     include: {
       firearm: true,
-      sessionLoads: { include: { load: true } },
-      groups: { include: { load: true, velocitySets: { include: { shots: true } } } },
+      sessionLoads: { include: { load: { include: { firearm: { select: { caliber: true } } } } } },
+      groups: {
+        include: {
+          load: { include: { firearm: { select: { caliber: true } } } },
+          velocitySets: { include: { shots: true } },
+        },
+      },
     },
   });
 
@@ -20,8 +26,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Session nicht gefunden" }, { status: 404 });
   }
 
-  const loadLabel = (load: { name: string | null; powder: string | null } | null) =>
-    load ? load.name ?? load.powder ?? "Ladung" : "—";
+  const loadLabel = (
+    load: { name: string | null; bulletWeightGr: number | null; bullet: string | null; firearm: { caliber: string } } | null
+  ) => (load ? loadDisplayName({ ...load, caliber: load.firearm.caliber }) : "—");
 
   const prefs = await getUnitPreferences();
 

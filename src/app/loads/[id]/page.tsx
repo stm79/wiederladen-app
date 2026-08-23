@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { deleteLoad } from "@/app/actions/loads";
 import { getDistinctLoadFieldValues } from "@/lib/loads/distinct-values";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
+import { loadDisplayName } from "@/lib/loads/label";
 
 export default async function LoadDetailPage({
   params,
@@ -18,7 +19,10 @@ export default async function LoadDetailPage({
   const [load, firearms, known] = await Promise.all([
     prisma.load.findUnique({
       where: { id },
-      include: { parentLoad: true, variants: { orderBy: { createdAt: "desc" } } },
+      include: {
+        parentLoad: { include: { firearm: { select: { caliber: true } } } },
+        variants: { orderBy: { createdAt: "desc" }, include: { firearm: { select: { caliber: true } } } },
+      },
     }),
     prisma.firearm.findMany({ orderBy: { name: "asc" } }),
     getDistinctLoadFieldValues(),
@@ -35,7 +39,7 @@ export default async function LoadDetailPage({
             <p className="mb-4 text-sm text-neutral-500">
               Variante von{" "}
               <Link href={`/loads/${load.parentLoad.id}`} className="underline">
-                {load.parentLoad.name ?? "Basisladung"}
+                {loadDisplayName({ ...load.parentLoad, caliber: load.parentLoad.firearm.caliber })}
               </Link>
             </p>
           )}
@@ -81,7 +85,7 @@ export default async function LoadDetailPage({
                 <span className="mr-2 text-neutral-400 tabular-nums">
                   {formatLoadNumber(variant.loadNumber, variant.variantLetter)}
                 </span>
-                {variant.name ?? "Ladung"}
+                {loadDisplayName({ ...variant, caliber: variant.firearm.caliber })}
               </Link>
             ))}
           </div>

@@ -11,6 +11,7 @@ export const loadSchema = z.object({
   firearmId: z.string().min(1, "Waffe ist erforderlich"),
   caseBrand: z.string().nullable().optional(),
   caseLoadCount: z.number().int().positive().nullable().optional(),
+  caseTrimLengthMm: z.number().positive().nullable().optional(),
   sizingDie: z.string().nullable().optional(),
   shoulderBumpMm: z.number().positive().nullable().optional(),
   bushingDiameterMm: z.number().positive().nullable().optional(),

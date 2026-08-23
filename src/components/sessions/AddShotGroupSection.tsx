@@ -9,7 +9,7 @@ export function AddShotGroupSection({
   loads,
 }: {
   sessionId: string;
-  loads: { id: string; name: string | null; powder: string | null }[];
+  loads: { id: string; name: string | null; caliber: string; bulletWeightGr: number | null; bullet: string | null }[];
 }) {
   const [open, setOpen] = useState(false);
 

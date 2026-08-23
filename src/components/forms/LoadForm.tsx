@@ -26,6 +26,7 @@ interface LoadFormProps {
     firearmId: string;
     caseBrand: string | null;
     caseLoadCount: number | null;
+    caseTrimLengthMm: number | null;
     sizingDie: string | null;
     shoulderBumpMm: number | null;
     bushingDiameterMm: number | null;
@@ -72,6 +73,7 @@ export function LoadForm({
           firearmId: defaultFirearmId ?? firearms[0]?.id ?? "",
           caseBrand: "",
           caseLoadCount: null,
+          caseTrimLengthMm: null,
           sizingDie: "",
           shoulderBumpMm: null,
           bushingDiameterMm: null,
@@ -135,7 +137,12 @@ export function LoadForm({
       </div>
 
       <FormField label="Bezeichnung (optional)" htmlFor="name">
-        <input id="name" className={inputClass} placeholder='z.B. "Erste Testladung"' {...register("name")} />
+        <input
+          id="name"
+          className={inputClass}
+          placeholder="sonst automatisch: Kaliber + Geschossgewicht + Geschoss"
+          {...register("name")}
+        />
       </FormField>
 
       <FormField label="Waffe" htmlFor="firearmId" error={errors.firearmId?.message}>
@@ -235,6 +242,16 @@ export function LoadForm({
                   value={field.value ?? ""}
                   onChange={(e) => field.onChange(e.target.value === "" ? null : Number(e.target.value))}
                 />
+              )}
+            />
+          </FormField>
+
+          <FormField label="Hülse – Trimmlänge" htmlFor="caseTrimLengthMm">
+            <Controller
+              control={control}
+              name="caseTrimLengthMm"
+              render={({ field }) => (
+                <UnitValueInput id="caseTrimLengthMm" kind="length" value={field.value} onChange={field.onChange} />
               )}
             />
           </FormField>

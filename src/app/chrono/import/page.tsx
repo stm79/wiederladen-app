@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ImportWizard } from "@/components/chrono/ImportWizard";
+import { loadDisplayName } from "@/lib/loads/label";
 
 // Depends on which session/loads exist right now; no revalidatePath targets this route.
 export const dynamic = "force-dynamic";
@@ -16,7 +17,7 @@ export default async function ChronoImportPage({
 
   const group = await prisma.shotGroup.findUnique({
     where: { id: groupId },
-    include: { session: true, load: true },
+    include: { session: true, load: { include: { firearm: { select: { caliber: true } } } } },
   });
   if (!group) notFound();
 
@@ -26,7 +27,7 @@ export default async function ChronoImportPage({
         <h1 className="text-xl font-semibold">
           Chrono-Daten importieren
           <span className="ml-2 text-sm font-normal text-neutral-500">
-            {group.load?.name ?? group.load?.powder ?? "Ohne Ladung"}
+            {group.load ? loadDisplayName({ ...group.load, caliber: group.load.firearm.caliber }) : "Ohne Ladung"}
           </span>
         </h1>
         <Link href={`/sessions/${group.sessionId}`} className="text-sm text-neutral-500 underline">

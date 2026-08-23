@@ -23,6 +23,7 @@ export async function GET() {
     cbtoMm: l.cbtoMm ?? "",
     huelseMarke: l.caseBrand ?? "",
     huelseLoadCount: l.caseLoadCount ?? "",
+    huelseTrimmlaengeMm: l.caseTrimLengthMm ?? "",
     matrize: l.sizingDie ?? "",
     shoulderBumpMm: l.shoulderBumpMm ?? "",
     bushingDurchmesserMm: l.bushingDiameterMm ?? "",

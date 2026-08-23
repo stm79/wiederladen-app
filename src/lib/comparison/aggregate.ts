@@ -1,10 +1,12 @@
 import { computeVelocityStats } from "@/lib/stats/velocity-stats";
+import { loadDisplayName } from "@/lib/loads/label";
 
 export interface LoadComparisonRow {
   loadId: string;
   loadLabel: string;
   firearmId: string;
   firearmName: string;
+  caliber: string;
   powder: string | null;
   chargeGrains: number;
   bullet: string | null;
@@ -23,6 +25,7 @@ export interface LoadForComparison {
   name: string | null;
   firearmId: string;
   firearmName: string;
+  caliber: string;
   powder: string | null;
   chargeGrains: number;
   bullet: string | null;
@@ -40,9 +43,10 @@ export function buildComparisonRow(load: LoadForComparison): LoadComparisonRow {
 
   return {
     loadId: load.id,
-    loadLabel: load.name ?? (load.powder || "Ladung"),
+    loadLabel: loadDisplayName(load),
     firearmId: load.firearmId,
     firearmName: load.firearmName,
+    caliber: load.caliber,
     powder: load.powder,
     chargeGrains: load.chargeGrains,
     bullet: load.bullet,

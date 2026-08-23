@@ -8,10 +8,18 @@ import { sessionSchema, type SessionInput } from "@/lib/validation/session";
 import { createSession, updateSession } from "@/app/actions/sessions";
 import { FormField, inputClass } from "@/components/forms/FormField";
 import { Button } from "@/components/ui/Button";
+import { loadDisplayName } from "@/lib/loads/label";
 
 interface SessionFormProps {
   firearms: { id: string; name: string; caliber: string }[];
-  loads: { id: string; name: string | null; firearmId: string; powder: string | null }[];
+  loads: {
+    id: string;
+    name: string | null;
+    firearmId: string;
+    caliber: string;
+    bulletWeightGr: number | null;
+    bullet: string | null;
+  }[];
   session?: {
     id: string;
     date: Date;
@@ -195,7 +203,7 @@ export function SessionForm({ firearms, loads, session }: SessionFormProps) {
             {relevantLoads.map((load) => (
               <label key={load.id} className="flex items-center gap-2 text-sm">
                 <input type="checkbox" value={load.id} {...register("loadIds")} />
-                {load.name ?? (load.powder || "Ladung")}
+                {loadDisplayName(load)}
               </label>
             ))}
           </div>
