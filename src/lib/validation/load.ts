@@ -11,6 +11,7 @@ export const loadSchema = z.object({
   createdAt: z.string().min(1, "Datum ist erforderlich"), // ISO date string (yyyy-mm-dd) from <input type="date">
   firearmId: z.string().min(1, "Waffe ist erforderlich"),
   caseBrand: z.string().nullable().optional(),
+  caseQuantity: z.number().int().positive().nullable().optional(),
   caseLoadCount: z.number().int().positive().nullable().optional(),
   caseTrimLengthMm: z.number().positive().nullable().optional(),
   sizingDie: z.string().nullable().optional(),

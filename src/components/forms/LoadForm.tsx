@@ -27,6 +27,7 @@ interface LoadFormProps {
     createdAt: Date;
     firearmId: string;
     caseBrand: string | null;
+    caseQuantity: number | null;
     caseLoadCount: number | null;
     caseTrimLengthMm: number | null;
     sizingDie: string | null;
@@ -75,6 +76,7 @@ export function LoadForm({
           createdAt: toDateInputValue(new Date()),
           firearmId: defaultFirearmId ?? firearms[0]?.id ?? "",
           caseBrand: "",
+          caseQuantity: null,
           caseLoadCount: null,
           caseTrimLengthMm: null,
           sizingDie: "",
@@ -233,6 +235,26 @@ export function LoadForm({
           <FormField label="Hülse – Marke" htmlFor="caseBrand">
             <input id="caseBrand" className={inputClass} {...register("caseBrand")} />
           </FormField>
+
+          <FormField label="Hülse – Anzahl (Stück)" htmlFor="caseQuantity">
+            <Controller
+              control={control}
+              name="caseQuantity"
+              render={({ field }) => (
+                <input
+                  id="caseQuantity"
+                  type="number"
+                  step="1"
+                  min="1"
+                  inputMode="numeric"
+                  className={inputClass}
+                  value={field.value ?? ""}
+                  onChange={(e) => field.onChange(e.target.value === "" ? null : Number(e.target.value))}
+                />
+              )}
+            />
+          </FormField>
+
           <FormField label="Hülse – Load Count (Wiederladungen)" htmlFor="caseLoadCount">
             <Controller
               control={control}

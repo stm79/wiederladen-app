@@ -39,6 +39,7 @@ model Load {
   firearmId      String
   firearm        Firearm       @relation(fields: [firearmId], references: [id], onDelete: Cascade)
   caseBrand      String?
+  caseQuantity   Int?
   caseLoadCount  Int?
   caseTrimLengthMm Float?
   sizingDie      String?

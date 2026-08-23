@@ -22,6 +22,7 @@ export async function GET() {
     oalMm: l.oalMm ?? "",
     cbtoMm: l.cbtoMm ?? "",
     huelseMarke: l.caseBrand ?? "",
+    huelseAnzahl: l.caseQuantity ?? "",
     huelseLoadCount: l.caseLoadCount ?? "",
     huelseTrimmlaengeMm: l.caseTrimLengthMm ?? "",
     matrize: l.sizingDie ?? "",

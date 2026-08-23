@@ -54,6 +54,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         oalMm: load.oalMm,
         cbtoMm: load.cbtoMm,
         caseBrand: load.caseBrand,
+        caseQuantity: load.caseQuantity,
         caseLoadCount: load.caseLoadCount,
         caseTrimLengthMm: load.caseTrimLengthMm,
         sizingDie: load.sizingDie,

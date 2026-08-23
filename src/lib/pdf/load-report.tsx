@@ -19,6 +19,7 @@ export interface LoadReportData {
   oalMm: number | null;
   cbtoMm: number | null;
   caseBrand: string | null;
+  caseQuantity: number | null;
   caseLoadCount: number | null;
   caseTrimLengthMm: number | null;
   sizingDie: string | null;
@@ -65,6 +66,7 @@ export function LoadReportDocument({ load, prefs }: { load: LoadReportData; pref
 
         <Text style={s.sectionTitle}>Hülsenvorbereitung</Text>
         <Row label="Hülse" value={load.caseBrand ?? "—"} />
+        <Row label="Anzahl (Stück)" value={load.caseQuantity != null ? String(load.caseQuantity) : "—"} />
         <Row label="Load Count" value={load.caseLoadCount != null ? String(load.caseLoadCount) : "—"} />
         <Row label="Trimmlänge" value={fmt("length", load.caseTrimLengthMm, prefs)} />
         <Row label="Matrize" value={load.sizingDie ?? "—"} />
