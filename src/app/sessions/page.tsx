@@ -8,7 +8,7 @@ export default async function SessionsPage() {
   const sessions = await prisma.session.findMany({
     orderBy: { date: "desc" },
     include: {
-      firearm: true,
+      sessionFirearms: { include: { firearm: true } },
       _count: { select: { groups: true } },
       groups: { select: { _count: { select: { velocitySets: true } } } },
     },
@@ -38,7 +38,9 @@ export default async function SessionsPage() {
                   {new Intl.DateTimeFormat("de-DE").format(session.date)}
                   {session.location ? ` – ${session.location}` : ""}
                 </div>
-                <div className="text-sm text-neutral-500">{session.firearm?.name ?? "—"}</div>
+                <div className="text-sm text-neutral-500">
+                  {session.sessionFirearms.map((sf) => sf.firearm.name).join(", ") || "—"}
+                </div>
               </div>
               <div className="text-sm text-neutral-400">
                 {session._count.groups} Gruppen ·{" "}

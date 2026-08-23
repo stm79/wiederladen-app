@@ -27,9 +27,9 @@ interface SessionFormProps {
     tempC: number | null;
     pressureHPa: number | null;
     humidityPct: number | null;
-    firearmId: string | null;
     notes: string | null;
     sessionLoads: { loadId: string }[];
+    sessionFirearms: { firearmId: string }[];
   };
 }
 
@@ -56,7 +56,7 @@ export function SessionForm({ firearms, loads, session }: SessionFormProps) {
           tempC: session.tempC,
           pressureHPa: session.pressureHPa,
           humidityPct: session.humidityPct,
-          firearmId: session.firearmId,
+          firearmIds: session.sessionFirearms.map((sf) => sf.firearmId),
           notes: session.notes,
           loadIds: session.sessionLoads.map((sl) => sl.loadId),
         }
@@ -66,14 +66,15 @@ export function SessionForm({ firearms, loads, session }: SessionFormProps) {
           tempC: null,
           pressureHPa: null,
           humidityPct: null,
-          firearmId: null,
+          firearmIds: [],
           notes: "",
           loadIds: [],
         },
   });
 
-  const selectedFirearmId = watch("firearmId");
-  const relevantLoads = selectedFirearmId ? loads.filter((l) => l.firearmId === selectedFirearmId) : loads;
+  const selectedFirearmIds = watch("firearmIds");
+  const relevantLoads =
+    selectedFirearmIds.length > 0 ? loads.filter((l) => selectedFirearmIds.includes(l.firearmId)) : loads;
 
   async function onSubmit(values: SessionInput) {
     setServerError(null);
@@ -100,21 +101,6 @@ export function SessionForm({ firearms, loads, session }: SessionFormProps) {
 
         <FormField label="Ort" htmlFor="location">
           <input id="location" className={inputClass} {...register("location")} />
-        </FormField>
-
-        <FormField label="Waffe (optional)" htmlFor="firearmId">
-          <select
-            id="firearmId"
-            className={inputClass}
-            {...register("firearmId")}
-          >
-            <option value="">— keine —</option>
-            {firearms.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.name} ({f.caliber})
-              </option>
-            ))}
-          </select>
         </FormField>
 
         <FormField label="Temperatur (°C)" htmlFor="tempC">
@@ -172,10 +158,25 @@ export function SessionForm({ firearms, loads, session }: SessionFormProps) {
         </FormField>
       </div>
 
+      <FormField label="Waffen (optional)" htmlFor="firearmIds">
+        {firearms.length === 0 ? (
+          <p className="text-sm text-neutral-500">Noch keine Waffen angelegt.</p>
+        ) : (
+          <div className="flex max-h-48 flex-col gap-1 overflow-y-auto rounded-md border border-neutral-300 p-2 dark:border-neutral-700">
+            {firearms.map((f) => (
+              <label key={f.id} className="flex items-center gap-2 text-sm">
+                <input type="checkbox" value={f.id} {...register("firearmIds")} />
+                {f.name} ({f.caliber})
+              </label>
+            ))}
+          </div>
+        )}
+      </FormField>
+
       <FormField label="Verwendete Ladedaten" htmlFor="loadIds">
         {relevantLoads.length === 0 ? (
           <p className="text-sm text-neutral-500">
-            {selectedFirearmId ? "Keine Ladedaten für diese Waffe." : "Noch keine Ladedaten vorhanden."}
+            {selectedFirearmIds.length > 0 ? "Keine Ladedaten für diese Waffen." : "Noch keine Ladedaten vorhanden."}
           </p>
         ) : (
           <div className="flex max-h-48 flex-col gap-1 overflow-y-auto rounded-md border border-neutral-300 p-2 dark:border-neutral-700">

@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const session = await prisma.session.findUnique({
     where: { id },
     include: {
-      firearm: true,
+      sessionFirearms: { include: { firearm: true } },
       sessionLoads: { include: { load: { include: { firearm: { select: { caliber: true } } } } } },
       groups: {
         include: {
@@ -37,7 +37,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       session={{
         date: session.date,
         location: session.location,
-        firearmName: session.firearm?.name ?? null,
+        firearmName: session.sessionFirearms.map((sf) => sf.firearm.name).join(", ") || null,
         tempC: session.tempC,
         pressureHPa: session.pressureHPa,
         humidityPct: session.humidityPct,

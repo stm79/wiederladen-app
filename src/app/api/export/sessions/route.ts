@@ -3,7 +3,7 @@ import { csvResponse } from "@/lib/csv-response";
 
 export async function GET() {
   const sessions = await prisma.session.findMany({
-    include: { firearm: true },
+    include: { sessionFirearms: { include: { firearm: true } } },
     orderBy: { date: "desc" },
   });
 
@@ -11,7 +11,7 @@ export async function GET() {
     id: s.id,
     datum: s.date.toISOString().slice(0, 10),
     ort: s.location ?? "",
-    waffe: s.firearm?.name ?? "",
+    waffen: s.sessionFirearms.map((sf) => sf.firearm.name).join(", "),
     temperaturC: s.tempC ?? "",
     luftdruckHPa: s.pressureHPa ?? "",
     luftfeuchtigkeitPct: s.humidityPct ?? "",

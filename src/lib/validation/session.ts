@@ -6,11 +6,11 @@ export const sessionSchema = z.object({
   tempC: z.number().nullable().optional(),
   pressureHPa: z.number().nullable().optional(),
   humidityPct: z.number().min(0).max(100).nullable().optional(),
-  firearmId: z.string().nullable().optional(),
+  firearmIds: z.array(z.string()),
   notes: z.string().nullable().optional(),
   loadIds: z.array(z.string()),
 });
 
 export type SessionInput = z.infer<typeof sessionSchema>;
 
-export const SESSION_OPTIONAL_TEXT_FIELDS = ["location", "notes", "firearmId"] as const;
+export const SESSION_OPTIONAL_TEXT_FIELDS = ["location", "notes"] as const;

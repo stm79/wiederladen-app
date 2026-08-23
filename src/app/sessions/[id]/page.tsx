@@ -20,6 +20,7 @@ export default async function SessionDetailPage({
       where: { id },
       include: {
         sessionLoads: { include: { load: { include: { firearm: { select: { caliber: true } } } } } },
+        sessionFirearms: true,
         groups: {
           include: { images: true, velocitySets: { include: { shots: true }, orderBy: { importedAt: "desc" } } },
           orderBy: { createdAt: "desc" },

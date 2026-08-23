@@ -5,6 +5,7 @@ import { LoadForm } from "@/components/forms/LoadForm";
 import { DeleteButton } from "@/components/ui/DeleteButton";
 import { DuplicateButton } from "@/components/ui/DuplicateButton";
 import { Button } from "@/components/ui/Button";
+import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
 import { deleteLoad } from "@/app/actions/loads";
 import { getDistinctLoadFieldValues } from "@/lib/loads/distinct-values";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
@@ -22,6 +23,7 @@ export default async function LoadDetailPage({
       include: {
         parentLoad: { include: { firearm: { select: { caliber: true } } } },
         variants: { orderBy: { createdAt: "desc" }, include: { firearm: { select: { caliber: true } } } },
+        shotGroups: { include: { session: true }, orderBy: { createdAt: "desc" } },
       },
     }),
     prisma.firearm.findMany({ orderBy: { name: "asc" } }),
@@ -71,6 +73,33 @@ export default async function LoadDetailPage({
           />
         </div>
       </div>
+
+      {load.shotGroups.length > 0 && (
+        <div>
+          <h2 className="mb-3 text-lg font-semibold">Schussgruppen mit dieser Ladung</h2>
+          <div className="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-800">
+            {load.shotGroups.map((group) => (
+              <Link
+                key={group.id}
+                href={`/sessions/${group.sessionId}`}
+                className="flex items-center justify-between py-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              >
+                <div>
+                  <div className="font-medium">
+                    {new Intl.DateTimeFormat("de-DE").format(group.session.date)}
+                    {group.session.location ? ` – ${group.session.location}` : ""}
+                  </div>
+                  <div className="text-sm text-neutral-500">
+                    {group.distanceM ? `${group.distanceM} m · ` : ""}
+                    {group.shotCount ? `${group.shotCount} Schuss` : ""}
+                  </div>
+                </div>
+                <UnitValueDisplay kind="length" value={group.extremeSpreadMm} />
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {load.variants.length > 0 && (
         <div>
