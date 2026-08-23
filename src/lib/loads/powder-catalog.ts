@@ -1,9 +1,9 @@
-/** Reference catalog of current powders from Vihtavuori, Reload Swiss, and
- *  Lovex, offered as dropdown suggestions on the load form (in addition to
- *  whatever's already been typed into existing loads — see
- *  getDistinctLoadFieldValues). The field stays free text, so anything
- *  missing here (a newer/discontinued product, another brand) can still be
- *  typed in directly. */
+/** Reference catalog of current powders from Vihtavuori, Reload Swiss, Lovex,
+ *  Hodgdon, Alliant, Norma, and Vectan, offered as dropdown suggestions on
+ *  the load form (in addition to whatever's already been typed into
+ *  existing loads — see getDistinctLoadFieldValues). The field stays free
+ *  text, so anything missing here (a newer/discontinued product, another
+ *  brand) can still be typed in directly. */
 export const POWDER_CATALOG: string[] = [
   // Vihtavuori N100 series (rifle)
   "Vihtavuori N110",
@@ -74,4 +74,112 @@ export const POWDER_CATALOG: string[] = [
   "Lovex S065",
   "Lovex S070",
   "Lovex S071",
+
+  // Hodgdon (rifle)
+  "Hodgdon H4198",
+  "Hodgdon Benchmark",
+  "Hodgdon H322",
+  "Hodgdon Varget",
+  "Hodgdon H4350",
+  "Hodgdon H4831",
+  "Hodgdon H4831SC",
+  "Hodgdon H1000",
+  "Hodgdon Retumbo",
+  "Hodgdon US 869",
+  "Hodgdon H50BMG",
+  "Hodgdon BL-C(2)",
+  "Hodgdon H335",
+  "Hodgdon H380",
+  "Hodgdon H414",
+  "Hodgdon H110",
+  "Hodgdon CFE 223",
+  "Hodgdon CFE BLK",
+  "Hodgdon Superformance",
+  "Hodgdon LEVERevolution",
+  // Hodgdon (pistol/shotgun)
+  "Hodgdon Titegroup",
+  "Hodgdon Titewad",
+  "Hodgdon Clays",
+  "Hodgdon International Clays",
+  "Hodgdon Universal",
+  "Hodgdon HP-38",
+  "Hodgdon HS-6",
+  "Hodgdon HS-7",
+  "Hodgdon Longshot",
+  "Hodgdon Trail Boss",
+  "Hodgdon CFE Pistol",
+  "Hodgdon Lil'Gun",
+
+  // Alliant (rifle)
+  "Alliant AR-Comp",
+  "Alliant Power Pro 1200-R",
+  "Alliant Power Pro 2000-MR",
+  "Alliant Power Pro 4000-MR",
+  "Alliant Power Pro Varmint",
+  "Alliant Reloder 7",
+  "Alliant Reloder 10X",
+  "Alliant Reloder TS 11",
+  "Alliant Reloder 15",
+  "Alliant Reloder TS 15.5",
+  "Alliant Reloder 16",
+  "Alliant Reloder 17",
+  "Alliant Reloder 19",
+  "Alliant Reloder 22",
+  "Alliant Reloder 23",
+  "Alliant Reloder 25",
+  "Alliant Reloder 26",
+  "Alliant Reloder 33",
+  "Alliant Reloder 50",
+  // Alliant (pistol/shotgun)
+  "Alliant Bullseye",
+  "Alliant Red Dot",
+  "Alliant Green Dot",
+  "Alliant Blue Dot",
+  "Alliant Clay Dot",
+  "Alliant Herco",
+  "Alliant American Select",
+  "Alliant Sport Pistol",
+  "Alliant Power Pistol",
+  "Alliant Power Pro 300-MP",
+  "Alliant Unique",
+  "Alliant 2400",
+  "Alliant BE-86",
+  "Alliant e3",
+  "Alliant Extra-Lite",
+  "Alliant Pro Reach",
+  "Alliant Promo",
+  "Alliant Steel",
+
+  // Norma
+  "Norma 200",
+  "Norma 201",
+  "Norma 202",
+  "Norma 203-B",
+  "Norma 204",
+  "Norma 217",
+  "Norma URP",
+  "Norma MRP",
+
+  // Vectan (rifle SP series)
+  "Vectan SP2",
+  "Vectan SP3",
+  "Vectan SP4",
+  "Vectan SP5",
+  "Vectan SP6",
+  "Vectan SP7",
+  "Vectan SP8",
+  "Vectan SP9",
+  "Vectan SP10",
+  "Vectan SP11",
+  "Vectan SP12",
+  "Vectan SP13",
+  // Vectan (pistol)
+  "Vectan A0",
+  "Vectan A1",
+  "Vectan AS",
+  "Vectan Ba6½",
+  "Vectan Ba7½",
+  "Vectan Ba9",
+  "Vectan Ba9½",
+  "Vectan Ba10",
 ];

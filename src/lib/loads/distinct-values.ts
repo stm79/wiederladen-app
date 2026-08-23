@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { POWDER_CATALOG } from "@/lib/loads/powder-catalog";
+import { BULLET_CATALOG } from "@/lib/loads/bullet-catalog";
 
 /** Distinct, previously-used values for the combobox-with-history fields on
  *  the load form (powder, bullet, primer) — lets the user pick a value
@@ -29,9 +30,12 @@ export async function getDistinctLoadFieldValues() {
   const usedPowders = powders.map((p) => p.powder!);
   const allPowders = Array.from(new Set([...POWDER_CATALOG, ...usedPowders])).sort((a, b) => a.localeCompare(b));
 
+  const usedBullets = bullets.map((b) => b.bullet!);
+  const allBullets = Array.from(new Set([...BULLET_CATALOG, ...usedBullets])).sort((a, b) => a.localeCompare(b));
+
   return {
     powders: allPowders,
-    bullets: bullets.map((b) => b.bullet!),
+    bullets: allBullets,
     primers: primers.map((p) => p.primer!),
   };
 }
