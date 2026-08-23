@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
-import { labelNumber } from "@/lib/label-format";
+import { labelNumber, labelPowder } from "@/lib/label-format";
 import { PrintButton } from "@/components/ui/PrintButton";
 
 // Dymo LabelWriter 450, 36 x 89mm label stock.
@@ -66,7 +66,7 @@ export default async function LoadLabelPage({
         </div>
         <div className="flex justify-between gap-2">
           <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-            Pulver: {load.powder ?? "–"}
+            Pulver: {labelPowder(load.powder)}
           </span>
           <span className="shrink-0 whitespace-nowrap">Ladung: {labelNumber(load.chargeGrains, 2)} gn</span>
         </div>
