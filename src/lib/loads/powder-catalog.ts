@@ -1,6 +1,6 @@
 /** Reference catalog of current powders from Vihtavuori, Reload Swiss, Lovex,
- *  Hodgdon, Alliant, Norma, and Vectan, offered as dropdown suggestions on
- *  the load form (in addition to whatever's already been typed into
+ *  IMR, Hodgdon, Alliant, Norma, and Vectan, offered as dropdown suggestions
+ *  on the load form (in addition to whatever's already been typed into
  *  existing loads — see getDistinctLoadFieldValues). The field stays free
  *  text, so anything missing here (a newer/discontinued product, another
  *  brand) can still be typed in directly. */
@@ -74,6 +74,22 @@ export const POWDER_CATALOG: string[] = [
   "Lovex S065",
   "Lovex S070",
   "Lovex S071",
+
+  // IMR (rifle)
+  "IMR 3031",
+  "IMR 4198",
+  "IMR 4064",
+  "IMR 4895",
+  "IMR 4350",
+  "IMR 4831",
+  "IMR 4227",
+  "IMR 7828 SSC",
+  "IMR 8208 XBR",
+  "IMR Enduron 4166",
+  "IMR Enduron 4451",
+  "IMR Enduron 4955",
+  "IMR Enduron 7977",
+  "IMR Enduron 8133",
 
   // Hodgdon (rifle)
   "Hodgdon H4198",

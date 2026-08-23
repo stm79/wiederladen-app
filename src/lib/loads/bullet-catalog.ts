@@ -1,11 +1,11 @@
 /** Reference catalog of current component-bullet lines from Hornady, Sierra,
- *  Nosler, Berger, and Lapua, offered as dropdown suggestions on the load
- *  form (in addition to whatever's already been typed into existing loads —
- *  see getDistinctLoadFieldValues). Lists product lines/families rather
- *  than individual caliber+weight SKUs (there are far too many of those to
- *  enumerate usefully). The field stays free text, so anything missing here
- *  (a specific weight/caliber, a newer/discontinued line, another brand)
- *  can still be typed in directly. */
+ *  Nosler, Berger, Lapua, Norma, and Fox Bullets, offered as dropdown
+ *  suggestions on the load form (in addition to whatever's already been
+ *  typed into existing loads — see getDistinctLoadFieldValues). Lists
+ *  product lines/families rather than individual caliber+weight SKUs (there
+ *  are far too many of those to enumerate usefully). The field stays free
+ *  text, so anything missing here (a specific weight/caliber, a
+ *  newer/discontinued line, another brand) can still be typed in directly. */
 export const BULLET_CATALOG: string[] = [
   // Hornady
   "Hornady A-MAX",
@@ -80,4 +80,17 @@ export const BULLET_CATALOG: string[] = [
   "Lapua FMJ",
   "Lapua Soft Point",
   "Lapua Cutting Edge",
+
+  // Norma
+  "Norma Oryx",
+  "Norma Vulkan",
+  "Norma Alaska",
+  "Norma Tipstrike",
+  "Norma Ecostrike",
+  "Norma Golden Target",
+  "Norma FMJ",
+
+  // Fox Bullets
+  "Fox Classic Hunter",
+  "Fox Target",
 ];
