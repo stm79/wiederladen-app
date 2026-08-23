@@ -8,6 +8,7 @@ export const loadSchema = z.object({
     .max(4)
     .regex(/^[A-Za-z]*$/, "Nur Buchstaben (A, B, C, …)"),
   name: z.string().nullable().optional(),
+  createdAt: z.string().min(1, "Datum ist erforderlich"), // ISO date string (yyyy-mm-dd) from <input type="date">
   firearmId: z.string().min(1, "Waffe ist erforderlich"),
   caseBrand: z.string().nullable().optional(),
   caseLoadCount: z.number().int().positive().nullable().optional(),

@@ -10,6 +10,7 @@ import { FormField, inputClass } from "@/components/forms/FormField";
 import { ComboboxInput } from "@/components/forms/ComboboxInput";
 import { UnitValueInput } from "@/components/units/UnitValueInput";
 import { Button } from "@/components/ui/Button";
+import { toDateInputValue } from "@/lib/date-input";
 
 interface LoadFormProps {
   firearms: { id: string; name: string; caliber: string }[];
@@ -23,6 +24,7 @@ interface LoadFormProps {
     loadNumber: number;
     variantLetter: string;
     name: string | null;
+    createdAt: Date;
     firearmId: string;
     caseBrand: string | null;
     caseLoadCount: number | null;
@@ -65,11 +67,12 @@ export function LoadForm({
   } = useForm<LoadInput>({
     resolver: zodResolver(loadSchema),
     defaultValues: load
-      ? { ...load }
+      ? { ...load, createdAt: toDateInputValue(load.createdAt) }
       : {
           loadNumber: suggestedLoadNumber ?? 1,
           variantLetter: "",
           name: "",
+          createdAt: toDateInputValue(new Date()),
           firearmId: defaultFirearmId ?? firearms[0]?.id ?? "",
           caseBrand: "",
           caseLoadCount: null,
@@ -133,6 +136,9 @@ export function LoadForm({
             maxLength={4}
             {...register("variantLetter")}
           />
+        </FormField>
+        <FormField label="Erstellt am" htmlFor="createdAt" error={errors.createdAt?.message}>
+          <input id="createdAt" type="date" className={inputClass} {...register("createdAt")} />
         </FormField>
       </div>
 

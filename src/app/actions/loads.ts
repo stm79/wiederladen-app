@@ -22,7 +22,11 @@ function friendlyError(error: unknown): string {
 
 export async function createLoad(input: LoadInput): Promise<LoadActionResult> {
   const parsed = normalizeEmptyStrings(loadSchema.parse(input), LOAD_OPTIONAL_TEXT_FIELDS);
-  const data = { ...parsed, variantLetter: parsed.variantLetter.toUpperCase() };
+  const data = {
+    ...parsed,
+    variantLetter: parsed.variantLetter.toUpperCase(),
+    createdAt: new Date(parsed.createdAt),
+  };
 
   try {
     const load = await prisma.load.create({ data });
@@ -35,7 +39,11 @@ export async function createLoad(input: LoadInput): Promise<LoadActionResult> {
 
 export async function updateLoad(id: string, input: LoadInput): Promise<LoadActionResult> {
   const parsed = normalizeEmptyStrings(loadSchema.parse(input), LOAD_OPTIONAL_TEXT_FIELDS);
-  const data = { ...parsed, variantLetter: parsed.variantLetter.toUpperCase() };
+  const data = {
+    ...parsed,
+    variantLetter: parsed.variantLetter.toUpperCase(),
+    createdAt: new Date(parsed.createdAt),
+  };
 
   try {
     const load = await prisma.load.update({ where: { id }, data });

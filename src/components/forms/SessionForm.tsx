@@ -9,6 +9,7 @@ import { createSession, updateSession } from "@/app/actions/sessions";
 import { FormField, inputClass } from "@/components/forms/FormField";
 import { Button } from "@/components/ui/Button";
 import { loadDisplayName } from "@/lib/loads/label";
+import { toDateInputValue } from "@/lib/date-input";
 
 interface SessionFormProps {
   firearms: { id: string; name: string; caliber: string }[];
@@ -31,10 +32,6 @@ interface SessionFormProps {
     sessionLoads: { loadId: string }[];
     sessionFirearms: { firearmId: string }[];
   };
-}
-
-function toDateInputValue(date: Date): string {
-  return date.toISOString().slice(0, 10);
 }
 
 export function SessionForm({ firearms, loads, session }: SessionFormProps) {
