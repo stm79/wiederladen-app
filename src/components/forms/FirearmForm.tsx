@@ -7,10 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { firearmSchema, type FirearmInput } from "@/lib/validation/firearm";
 import { createFirearm, updateFirearm } from "@/app/actions/firearms";
 import { FormField, inputClass } from "@/components/forms/FormField";
+import { ComboboxInput } from "@/components/forms/ComboboxInput";
 import { UnitValueInput } from "@/components/units/UnitValueInput";
 import { Button } from "@/components/ui/Button";
 
 interface FirearmFormProps {
+  knownCalibers: string[];
   firearm?: {
     id: string;
     name: string;
@@ -21,7 +23,7 @@ interface FirearmFormProps {
   };
 }
 
-export function FirearmForm({ firearm }: FirearmFormProps) {
+export function FirearmForm({ knownCalibers, firearm }: FirearmFormProps) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -72,7 +74,12 @@ export function FirearmForm({ firearm }: FirearmFormProps) {
       </FormField>
 
       <FormField label="Kaliber" htmlFor="caliber" error={errors.caliber?.message}>
-        <input id="caliber" className={inputClass} placeholder="z.B. .308 Win" {...register("caliber")} />
+        <ComboboxInput
+          id="caliber"
+          options={knownCalibers}
+          placeholder="z.B. .308 Winchester"
+          {...register("caliber")}
+        />
       </FormField>
 
       <FormField label="Lauflänge" htmlFor="barrelLenMm" error={errors.barrelLenMm?.message}>

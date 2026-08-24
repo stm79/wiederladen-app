@@ -8,6 +8,7 @@ import { LadderChart } from "@/components/charts/LadderChart";
 import { deleteFirearm } from "@/app/actions/firearms";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
 import { loadDisplayName } from "@/lib/loads/label";
+import { getKnownCalibers } from "@/lib/firearms/distinct-values";
 
 export default async function FirearmDetailPage({
   params,
@@ -15,12 +16,15 @@ export default async function FirearmDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const firearm = await prisma.firearm.findUnique({
-    where: { id },
-    include: {
-      loads: { orderBy: { createdAt: "desc" }, include: { shotGroups: { include: { velocitySets: true } } } },
-    },
-  });
+  const [firearm, knownCalibers] = await Promise.all([
+    prisma.firearm.findUnique({
+      where: { id },
+      include: {
+        loads: { orderBy: { createdAt: "desc" }, include: { shotGroups: { include: { velocitySets: true } } } },
+      },
+    }),
+    getKnownCalibers(),
+  ]);
 
   if (!firearm) notFound();
 
@@ -46,7 +50,7 @@ export default async function FirearmDetailPage({
       <div className="flex flex-col gap-6 sm:flex-row sm:justify-between">
         <div className="max-w-lg flex-1">
           <h1 className="mb-4 text-xl font-semibold">Waffe bearbeiten</h1>
-          <FirearmForm firearm={firearm} />
+          <FirearmForm firearm={firearm} knownCalibers={knownCalibers} />
         </div>
         <div className="shrink-0">
           <DeleteButton

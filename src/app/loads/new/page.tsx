@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { LoadForm } from "@/components/forms/LoadForm";
 import { getDistinctLoadFieldValues } from "@/lib/loads/distinct-values";
 
+// Depends on the current firearms/loads lists and suggested next load
+// number, which aren't revalidated from this route — always render fresh.
+export const dynamic = "force-dynamic";
+
 export default async function NewLoadPage({
   searchParams,
 }: {
