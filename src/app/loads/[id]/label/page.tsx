@@ -54,7 +54,7 @@ export default async function LoadLabelPage({
       >
         <div className="flex justify-between gap-2 font-bold">
           <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-            Waffe: {load.firearm.name}
+            Waffe: {load.firearm.name} ({load.firearm.caliber})
           </span>
           <span className="shrink-0 whitespace-nowrap">
             No: {formatLoadNumber(load.loadNumber, load.variantLetter)}
