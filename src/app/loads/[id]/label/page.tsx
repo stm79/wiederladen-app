@@ -54,16 +54,16 @@ export default async function LoadLabelPage({
           fontFamily: "Arial, Helvetica, sans-serif",
         }}
       >
-        <div className="overflow-hidden text-ellipsis whitespace-nowrap font-bold">
-          Waffe: {load.firearm.name}
-        </div>
         <div className="flex justify-between gap-2 font-bold">
           <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-            Kaliber: {load.firearm.caliber}
+            Waffe: {load.firearm.name}
           </span>
           <span className="shrink-0 whitespace-nowrap">
             No: {formatLoadNumber(load.loadNumber, load.variantLetter)}
           </span>
+        </div>
+        <div className="overflow-hidden text-ellipsis whitespace-nowrap font-bold">
+          Kaliber: {load.firearm.caliber}
         </div>
         <div className="overflow-hidden text-ellipsis whitespace-nowrap">
           Geschoss: {bulletWeight}
