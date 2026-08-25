@@ -45,22 +45,22 @@ export default async function LoadLabelPage({
           // unprintable strip at the top and right edges that print preview
           // doesn't show — confirmed via test prints, top row and rightmost
           // characters were getting cut off. Extra padding on those two sides
-          // compensates; font/line-height trimmed slightly so 5 rows still fit.
+          // compensates; font/line-height trimmed so 6 rows fit (tighter than
+          // the original 5-row calibration — re-check on a real print and
+          // shrink further here if the last row runs off the label).
           padding: "7mm 6mm 1.5mm 2.5mm",
-          fontSize: "13pt",
-          lineHeight: 1.12,
+          fontSize: "12pt",
+          lineHeight: 1.05,
           fontFamily: "Arial, Helvetica, sans-serif",
         }}
       >
+        <div className="overflow-hidden text-ellipsis whitespace-nowrap font-bold">
+          Waffe: {load.firearm.name}
+        </div>
         <div className="flex justify-between gap-2 font-bold">
-          {/* Waffe (the name alone) sits in the truncating flex-1 slot — if
-              anything has to get cut off by the ellipsis it should be the
-              name, not the caliber, which is the safety-critical bit and so
-              lives in its own never-truncated shrink-0 slot like No:. */}
           <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-            Waffe: {load.firearm.name}
+            Kaliber: {load.firearm.caliber}
           </span>
-          <span className="shrink-0 whitespace-nowrap">{load.firearm.caliber}</span>
           <span className="shrink-0 whitespace-nowrap">
             No: {formatLoadNumber(load.loadNumber, load.variantLetter)}
           </span>
