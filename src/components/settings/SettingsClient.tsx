@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useUnits } from "@/components/units/UnitProvider";
 import type { LengthUnit, VelocityUnit, WeightUnit } from "@/lib/units/types";
@@ -134,6 +135,9 @@ export function SettingsClient({ checklistSteps }: { checklistSteps: { id: strin
           Diese Schritte lassen sich bei jeder Ladung einzeln abhaken.
         </p>
         <ChecklistStepsManager steps={checklistSteps} />
+        <Link href="/checklist/label" className="text-sm text-neutral-600 underline dark:text-neutral-400">
+          Als Etikett drucken (Hochkant)
+        </Link>
       </section>
 
       <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6 dark:border-neutral-800">
