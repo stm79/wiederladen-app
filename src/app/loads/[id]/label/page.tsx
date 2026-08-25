@@ -53,9 +53,14 @@ export default async function LoadLabelPage({
         }}
       >
         <div className="flex justify-between gap-2 font-bold">
+          {/* Waffe (the name alone) sits in the truncating flex-1 slot — if
+              anything has to get cut off by the ellipsis it should be the
+              name, not the caliber, which is the safety-critical bit and so
+              lives in its own never-truncated shrink-0 slot like No:. */}
           <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-            Waffe: {load.firearm.name} ({load.firearm.caliber})
+            Waffe: {load.firearm.name}
           </span>
+          <span className="shrink-0 whitespace-nowrap">{load.firearm.caliber}</span>
           <span className="shrink-0 whitespace-nowrap">
             No: {formatLoadNumber(load.loadNumber, load.variantLetter)}
           </span>
