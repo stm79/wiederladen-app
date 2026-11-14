@@ -78,7 +78,7 @@ export default async function ComparePage() {
 
       <Section
         title="Eine Ladung über mehrere Sessions"
-        description="Dieselbe Ladung Session für Session — z.B. um zu sehen, wie stark unterschiedliche Temperaturen die Geschwindigkeit verändert haben."
+        description="Dieselbe Ladung Session für Session — Ø Geschwindigkeit (v0), SD und ES im Verlauf."
       >
         <LoadSessionCompare loadOptions={rows.map((r) => ({ loadId: r.loadId, loadLabel: r.loadLabel }))} sessionsByLoad={sessionsByLoad} />
       </Section>

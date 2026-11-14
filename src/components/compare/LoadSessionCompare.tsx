@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
-import { TemperatureVelocityChart } from "@/components/charts/TemperatureVelocityChart";
+import { SessionVelocityChart } from "@/components/charts/SessionVelocityChart";
+import { VelocityConsistencyChart } from "@/components/charts/VelocityConsistencyChart";
 import { Card, EmptyState } from "@/components/ui/Layout";
 import { inputClass } from "@/components/forms/FormField";
 
@@ -24,11 +25,24 @@ interface LoadSessionCompareProps {
 }
 
 const DATE_FORMAT = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+const SHORT_DATE = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" });
+
+/** Short x-axis labels ("14.06.26"); a second session on the same day gets
+ *  " (2)" so the chart categories stay distinct. */
+function sessionLabels(sessions: LoadSessionRow[]): string[] {
+  const seen = new Map<string, number>();
+  return sessions.map((s) => {
+    const base = SHORT_DATE.format(s.date);
+    const n = (seen.get(base) ?? 0) + 1;
+    seen.set(base, n);
+    return n > 1 ? `${base} (${n})` : base;
+  });
+}
 
 export function LoadSessionCompare({ loadOptions, sessionsByLoad }: LoadSessionCompareProps) {
   const [selectedLoadId, setSelectedLoadId] = useState(loadOptions[0]?.loadId ?? "");
   const sessions = (sessionsByLoad[selectedLoadId] ?? []).filter((s) => s.shotCount > 0);
-  const withTemp = sessions.filter((s) => s.tempC != null);
+  const labels = sessionLabels(sessions);
 
   if (loadOptions.length === 0) {
     return <p className="text-sm text-neutral-500">Noch keine Ladedaten vorhanden.</p>;
@@ -91,23 +105,20 @@ export function LoadSessionCompare({ loadOptions, sessionsByLoad }: LoadSessionC
             </table>
           </div>
 
-          {withTemp.length > 0 ? (
-            <Card>
-              <h3 className="mb-3 text-sm font-semibold">Temperatur vs. Ø Geschwindigkeit</h3>
-              <TemperatureVelocityChart
-              points={withTemp.map((s) => ({
-                tempC: s.tempC!,
-                avgMps: s.avgMps!,
-                date: s.date,
-                location: s.location,
-              }))}
-            />
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <Card className="min-w-0">
+              <h3 className="mb-3 text-sm font-semibold">Ø Geschwindigkeit (v0) je Session</h3>
+              <SessionVelocityChart
+                points={sessions.flatMap((s, i) => (s.avgMps != null ? [{ label: labels[i], avgMps: s.avgMps }] : []))}
+              />
             </Card>
-          ) : (
-            <p className="text-sm text-neutral-500">
-              Keine der Sessions dieser Ladung hat eine Temperatur erfasst — Diagramm braucht das.
-            </p>
-          )}
+            <Card className="min-w-0">
+              <h3 className="mb-3 text-sm font-semibold">SD / ES je Session</h3>
+              <VelocityConsistencyChart
+                points={sessions.map((s, i) => ({ loadLabel: labels[i], sdMps: s.sdMps, esMps: s.esMps }))}
+              />
+            </Card>
+          </div>
         </>
       )}
     </div>
