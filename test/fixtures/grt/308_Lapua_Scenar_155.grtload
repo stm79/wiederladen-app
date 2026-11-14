@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<GordonsReloadingTool version='2020.1774-NIGHTLY'>
+  <InnerBallistikInput>
+    <title>.308%20Win.%20%28308%20Winchester%2C%207%2C62%20x%2051%29%20Lapua%2C%20Scenar%20GB491%207073%20G7%2C%200.308%2C%20155%20grain%20ReloadSwiss%20RS%2052</title>
+    <config name="CurveFocusIdx" value="0" unit="" type="integer" descr="selected ladder curve for display" />
+    <caliber>
+      <input name="CaliberName" value=".308%20Win.%20%28308%20Winchester%2C%207%2C62%20x%2051%29" unit="" type="string" descr="caliber name" />
+      <input name="oal" value="71.629999999999995" unit="mm" type="decimal" descr="cartridge overall length" />
+      <input name="caselen" value="51.149999999999999" unit="mm" type="decimal" descr="case length" />
+      <input name="casevol" value="3.551635614101828" unit="cm3" type="decimal" descr="case volume" />
+      <input name="Dz" value="7.82" unit="mm" type="decimal" descr="groove caliber" />
+      <input name="Aeff" value="47.509999999999998" unit="mm2" type="decimal" descr="effektive area" />
+      <input name="pMaxZul" value="4150" unit="bar" type="decimal" descr="maximum allowed pressure" />
+      <input name="method" value="Piezo CIP" unit="" type="string" descr="cartridge test method" />
+      <input name="sebert" value="0.5" unit="" type="decimal" descr="Sebert factor" />
+      <input name="ps" value="250" unit="bar" type="decimal" descr="initial gas pressure" />
+      <input name="shotshell" value="false" unit="" type="boolean" descr="true if shotshell" />
+    </caliber>
+    <gun>
+      <input name="xe" value="510" unit="mm" type="decimal" descr="barrel length" />
+      <input name="mgun" value="0" unit="kg" type="decimal" descr="gun weight" />
+    </gun>
+    <projectile>
+      <input name="ProjectileName" value="Lapua%2C%20Scenar%20GB491%207073%20G7%2C%200.308%2C%20155%20grain" unit="" type="string" descr="projectile name" />
+      <input name="mname" value="" unit="" type="string" descr="projectile manufacturer" />
+      <input name="pname" value="" unit="" type="string" descr="projectile product name" />
+      <input name="lotid" value="" unit="" type="string" descr="projectile lot-id" />
+      <input name="Dbul" value="7.82" unit="mm" type="decimal" descr="projectile diameter" />
+      <input name="mp" value="10.043831049961881" unit="g" type="decimal" descr="projectile weight" />
+      <input name="gdepth" value="12.020000000000003" unit="mm" type="decimal" descr="bullet seating depth" />
+      <input name="glen" value="32.5" unit="mm" type="decimal" descr="projectile overall length" />
+      <input name="gtailh" value="5" unit="mm" type="decimal" descr="projectile tail length" />
+      <input name="gTailDiaA" value="7.8" unit="mm" type="decimal" descr="projectile tail diameter A" />
+      <input name="gTailDiaB" value="6.7" unit="mm" type="decimal" descr="projectile tail diameter B" />
+      <input name="gTailType" value="2" unit="" type="decimal" descr="projectile base type" />
+      <input name="gmaterial" value="0" unit="" type="decimal" descr="projectile material and gas sealing/losses" />
+      <input name="g1bc" value="0" unit="" type="decimal" descr="G1 ballistic coefficient" />
+      <input name="g7bc" value="0" unit="" type="decimal" descr="G7 ballistic coefficient" />
+      <input name="gUBCS" value="" unit="" type="string" descr="UBCS-Code (Universal Bullet Classification Scheme)" />
+    </projectile>
+    <propellant>
+      <input name="mname" value="ReloadSwiss" unit="" type="string" descr="propellant manufacturer" />
+      <input name="pname" value="RS%2052" unit="" type="string" descr="propellant product name" />
+      <input name="lotid" value="2019-01" unit="" type="string" descr="propellant lot-id" />
+      <input name="Ba" value="0.5045" unit="" type="decimal" descr="vivacity coefficient" />
+      <input name="Qex" value="3920" unit="kJ/kg" type="decimal" descr="specific explosive heat" />
+      <input name="k" value="1.2309" unit="" type="decimal" descr="ratio of the specific heat of the powder gases" />
+      <input name="a0" value="1.3753" unit="" type="decimal" descr="prog/deg coefficient" />
+      <input name="z1" value="0.52" unit="" type="decimal" descr="burn-up limit z1" />
+      <input name="z2" value="0.8409" unit="" type="decimal" descr="burn-up limit z2" />
+      <input name="eta" value="1" unit="cm3/g" type="decimal" descr="covolume of the powder gases" />
+      <input name="pc" value="1600" unit="kg/m3" type="decimal" descr="material density" />
+      <input name="pcd" value="950" unit="kg/m3" type="decimal" descr="bulk density" />
+      <input name="pt" value="21" unit="Cel" type="decimal" descr="temperature normal" />
+      <input name="tcc" value="0" unit="" type="decimal" descr="cold temperature coefficient" />
+      <input name="tch" value="0" unit="" type="decimal" descr="hot temperature coefficient" />
+      <input name="po" value="98066.5" unit="Pa" type="decimal" descr="technical atmosphere pressure" />
+      <input name="mc" value="2.922430840988909" unit="g" type="decimal" descr="propellant mass" />
+      <input name="laddercnt" value="1" unit="" type="decimal" descr="ladder steps (1 to 10, below 2: disabled)" />
+      <input name="laddermc" value="0.019439672999926" unit="g" type="decimal" descr="ladder step propellant mass" />
+      <input name="imageUuid" value="" unit="" type="string" descr="propellant picture uuid" />
+    </propellant>
+    <appendix>
+      <Measurement index="1" showinreport="false" title="Messung">
+        <charge name="Series%202" showinreport="true" expanded="true" note="MagnetoSpeed%20%22LOG.CSV%22" value="0.002915950949989" menu="" menuvalue="" menuunit="m" source="MagnetoSpeed">
+          <shot name="" velocity="834" pressure="0" />
+          <shot name="" velocity="840" pressure="0" />
+          <shot name="" velocity="837" pressure="0" />
+          <shot name="" velocity="838" pressure="0" />
+          <shot name="" velocity="841" pressure="0" />
+        </charge>
+      </Measurement>
+    </appendix>
+  </InnerBallistikInput>
+</GordonsReloadingTool>

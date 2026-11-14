@@ -1,7 +1,7 @@
 import { LinkButton } from "@/components/ui/Button";
 import { EmptyState, PageHeader } from "@/components/ui/Layout";
 import { prisma } from "@/lib/prisma";
-import { LoadForm } from "@/components/forms/LoadForm";
+import { NewLoadForm } from "@/components/loads/NewLoadForm";
 import { getDistinctLoadFieldValues } from "@/lib/loads/distinct-values";
 
 // Depends on the current firearms/loads lists and suggested next load
@@ -42,8 +42,8 @@ export default async function NewLoadPage({
   return (
     <div className="flex max-w-3xl flex-col gap-6">
       <PageHeader back={{ href: "/loads", label: "Ladedaten" }} title="Neue Ladung" />
-      <LoadForm
-        firearms={firearms}
+      <NewLoadForm
+        firearms={firearms.map((f) => ({ id: f.id, name: f.name, caliber: f.caliber }))}
         defaultFirearmId={firearmId}
         suggestedLoadNumber={suggestedLoadNumber}
         knownPowders={known.powders}

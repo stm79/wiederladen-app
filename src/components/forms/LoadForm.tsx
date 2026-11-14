@@ -46,6 +46,8 @@ interface LoadFormProps {
   };
   /** Pre-select a firearm when creating a new load (e.g. coming from a firearm detail page). */
   defaultFirearmId?: string;
+  /** New loads only: values filled in from an imported file (GRT). */
+  prefill?: Partial<LoadInput>;
 }
 
 export function LoadForm({
@@ -56,6 +58,7 @@ export function LoadForm({
   knownPrimers,
   load,
   defaultFirearmId,
+  prefill,
 }: LoadFormProps) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -92,6 +95,7 @@ export function LoadForm({
           cbtoMm: null,
           crimpInfo: "",
           notes: "",
+          ...prefill,
         },
   });
 
@@ -177,6 +181,11 @@ export function LoadForm({
 
         <FormField label="Waffe" htmlFor="firearmId" error={errors.firearmId?.message}>
           <select id="firearmId" className={inputClass} {...register("firearmId")}>
+            {!load && (
+              <option value="" disabled>
+                — Waffe wählen —
+              </option>
+            )}
             {firearms.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.name} ({f.caliber})
