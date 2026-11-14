@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/Button";
 import { loadDisplayName } from "@/lib/loads/label";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
 import { toDateInputValue } from "@/lib/date-input";
+import { ChronoFileImport, type ChronoImportResult } from "@/components/chrono/ChronoFileImport";
+import { Icon } from "@/components/ui/Icon";
 
 interface SessionFormProps {
   firearms: { id: string; name: string; caliber: string }[];
@@ -51,6 +53,9 @@ interface SessionFormProps {
 export function SessionForm({ firearms, loads, session, onCancel }: SessionFormProps) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
+  // New sessions only: chrono files attached per load (loadId -> parsed
+  // result, or null while a file picker is open but nothing usable yet).
+  const [measurements, setMeasurements] = useState<Record<string, ChronoImportResult | null>>({});
 
   const {
     register,
@@ -86,6 +91,17 @@ export function SessionForm({ firearms, loads, session, onCancel }: SessionFormP
   const selectedFirearmIds = watch("firearmIds");
   const relevantLoads =
     selectedFirearmIds.length > 0 ? loads.filter((l) => selectedFirearmIds.includes(l.firearmId)) : loads;
+  const selectedLoadIds = watch("loadIds");
+  const selectedLoads = loads.filter((l) => selectedLoadIds.includes(l.id));
+
+  function setMeasurement(loadId: string, result: ChronoImportResult | null | undefined) {
+    setMeasurements((prev) => {
+      const next = { ...prev };
+      if (result === undefined) delete next[loadId];
+      else next[loadId] = result;
+      return next;
+    });
+  }
 
   async function onSubmit(values: SessionInput) {
     setServerError(null);
@@ -95,7 +111,10 @@ export function SessionForm({ firearms, loads, session, onCancel }: SessionFormP
         router.push(`/sessions/${session.id}`);
         onCancel?.();
       } else {
-        const created = await createSession(values);
+        const attached = Object.entries(measurements).flatMap(([loadId, result]) =>
+          result && values.loadIds.includes(loadId) ? [{ loadId, ...result }] : []
+        );
+        const created = await createSession(values, attached);
         router.push(`/sessions/${created.id}`);
       }
       router.refresh();
@@ -190,6 +209,59 @@ export function SessionForm({ firearms, loads, session, onCancel }: SessionFormP
           )}
         </FormField>
       </FormSection>
+
+      {!session && selectedLoads.length > 0 && (
+        <FormSection
+          title="Messdaten"
+          description="Optional: Chrono-Datei direkt einer Ladung zuweisen. Daraus wird je Ladung eine Schussgruppe mit den Geschwindigkeiten."
+        >
+          <div className="col-span-full flex flex-col gap-3">
+            {selectedLoads.map((load) => {
+              const attached = load.id in measurements;
+              const result = measurements[load.id];
+              return (
+                <div
+                  key={load.id}
+                  className="min-w-0 rounded-lg border border-neutral-200 p-3 dark:border-neutral-800"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="shrink-0 font-mono text-xs text-neutral-400">
+                      {formatLoadNumber(load.loadNumber, load.variantLetter)}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium">{loadDisplayName(load)}</span>
+                    {attached && result && (
+                      <span className="hidden shrink-0 items-center gap-1 text-xs font-medium text-emerald-700 sm:flex dark:text-emerald-400">
+                        <Icon name="check" size={14} />
+                        {result.shots.length} Schuss
+                      </span>
+                    )}
+                    {attached ? (
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setMeasurement(load.id, undefined)}>
+                        Entfernen
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        icon="activity"
+                        onClick={() => setMeasurement(load.id, null)}
+                      >
+                        Chrono-Daten
+                      </Button>
+                    )}
+                  </div>
+                  {attached && (
+                    <div className="mt-3">
+                      <ChronoFileImport compact onChange={(r) => setMeasurement(load.id, r)} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </FormSection>
+      )}
 
       <FormSection title="Notizen">
         <div className="col-span-full">

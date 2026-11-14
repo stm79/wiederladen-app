@@ -21,7 +21,7 @@ export default async function NewSessionPage() {
       <PageHeader
         back={{ href: "/sessions", label: "Sessions" }}
         title="Neue Session"
-        subtitle="Schussgruppen und Chrono-Daten fügst du nach dem Anlegen hinzu."
+        subtitle="Chrono-Daten kannst du direkt hier einer Ladung zuweisen. Fotos und weitere Schussgruppen fügst du nach dem Anlegen hinzu."
       />
       <SessionForm firearms={firearms} loads={loads} />
     </div>
