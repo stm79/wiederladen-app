@@ -3,8 +3,11 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffffff;
+  --background: #f7f7f6;
   --foreground: #171717;
+  --brand: #b7791f;
+  --brand-strong: #8a5a12;
+  --brand-soft: #fbf1df;
 
   /* Chart tokens (dataviz skill reference palette) */
   --chart-surface: #fcfcfb;
@@ -27,13 +30,20 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Single accent (brass) — used sparingly: active nav, load numbers, focus. */
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 .dark {
-  --background: #0a0a0a;
+  --background: #0b0b0b;
   --foreground: #ededed;
+  --brand: #e0a443;
+  --brand-strong: #f0c27a;
+  --brand-soft: #2c2213;
 
   --chart-surface: #1a1a19;
   --chart-text-primary: #ffffff;
@@ -55,11 +65,33 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Native form controls follow the theme (date picker, select popups, scrollbars). */
+:root { color-scheme: light; }
+.dark { color-scheme: dark; }
+
+/* Numeric inputs: no spinner arrows — values are typed, and the arrows crowd
+   the unit switch next to them. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Native checkboxes in the accent color. */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--brand);
 }
 
 @media print {
-  nav {
+  nav,
+  .app-chrome {
     display: none !important;
   }
   main {

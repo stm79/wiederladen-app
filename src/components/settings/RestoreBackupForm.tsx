@@ -41,7 +41,7 @@ export function RestoreBackupForm() {
   }
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
       <input
         ref={inputRef}
         type="file"
@@ -53,12 +53,16 @@ export function RestoreBackupForm() {
       <Button
         type="button"
         variant="secondary"
+        icon="upload"
         disabled={status === "uploading" || status === "done"}
         onClick={() => inputRef.current?.click()}
         className="w-fit"
       >
         {status === "uploading" ? "Wird wiederhergestellt…" : "Backup wiederherstellen…"}
       </Button>
+      <span className="text-xs text-neutral-500 dark:text-neutral-400">
+        Überschreibt alle aktuellen Daten; vorher wird automatisch eine Sicherheitskopie angelegt.
+      </span>
       {status === "done" && (
         <span className="text-xs text-emerald-600">
           Wiederhergestellt — die App startet neu, Seite lädt gleich automatisch neu…

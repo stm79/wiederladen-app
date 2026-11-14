@@ -1,6 +1,8 @@
 import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
 import { VelocitySetDeleteButton } from "@/components/sessions/VelocitySetDeleteButton";
 import { VelocityShotChart } from "@/components/charts/VelocityShotChart";
+import { Stat } from "@/components/ui/Layout";
+import { Icon } from "@/components/ui/Icon";
 
 interface VelocitySetCardProps {
   velocitySet: {
@@ -17,29 +19,29 @@ interface VelocitySetCardProps {
 
 export function VelocitySetCard({ velocitySet, loadLabel }: VelocitySetCardProps) {
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-      <div className="flex items-start justify-between">
-        <div>
+    <div className="flex flex-col gap-3 rounded-lg border border-neutral-200/80 p-3 dark:border-neutral-800">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
           {loadLabel !== undefined && <div className="font-medium">{loadLabel ?? "Ohne Ladung"}</div>}
-          <div className="text-sm text-neutral-500">
-            {velocitySet.sourceDevice} · {velocitySet.shots.length} Schuss
+          <div className="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400">
+            <Icon name="activity" size={14} />
+            <span className="truncate">
+              {velocitySet.sourceDevice} · {velocitySet.shots.length} Schuss
+            </span>
           </div>
         </div>
         <VelocitySetDeleteButton id={velocitySet.id} />
       </div>
-      <div className="flex gap-6 text-sm">
-        <div>
-          <div className="text-neutral-500">Ø</div>
-          <UnitValueDisplay kind="velocity" value={velocitySet.avgMps} />
-        </div>
-        <div>
-          <div className="text-neutral-500">SD</div>
-          <UnitValueDisplay kind="velocity" value={velocitySet.sdMps} />
-        </div>
-        <div>
-          <div className="text-neutral-500">ES</div>
-          <UnitValueDisplay kind="velocity" value={velocitySet.esMps} />
-        </div>
+      <div className="grid grid-cols-3 gap-3">
+        <Stat label="Ø">
+          <UnitValueDisplay kind="velocity" value={velocitySet.avgMps} fractionDigits={1} />
+        </Stat>
+        <Stat label="SD">
+          <UnitValueDisplay kind="velocity" value={velocitySet.sdMps} fractionDigits={1} />
+        </Stat>
+        <Stat label="ES">
+          <UnitValueDisplay kind="velocity" value={velocitySet.esMps} fractionDigits={1} />
+        </Stat>
       </div>
       <VelocityShotChart shots={velocitySet.shots} />
     </div>

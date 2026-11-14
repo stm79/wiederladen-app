@@ -6,7 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loadSchema, type LoadInput } from "@/lib/validation/load";
 import { createLoad, updateLoad } from "@/app/actions/loads";
-import { FormField, inputClass } from "@/components/forms/FormField";
+import { FormActions, FormField, FormSection, inputClass, textareaClass } from "@/components/forms/FormField";
 import { ComboboxInput } from "@/components/forms/ComboboxInput";
 import { UnitValueInput } from "@/components/units/UnitValueInput";
 import { Button } from "@/components/ui/Button";
@@ -110,64 +110,91 @@ export function LoadForm({
     }
   }
 
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex max-w-2xl flex-col gap-4">
-      <div className="flex gap-4">
-        <FormField label="Ladungsnummer" htmlFor="loadNumber" error={errors.loadNumber?.message}>
-          <Controller
-            control={control}
-            name="loadNumber"
-            render={({ field }) => (
-              <input
-                id="loadNumber"
-                type="number"
-                step="1"
-                min="1"
-                inputMode="numeric"
-                className={`${inputClass} w-28`}
-                value={field.value ?? ""}
-                onChange={(e) => field.onChange(e.target.value === "" ? "" : Number(e.target.value))}
-              />
-            )}
-          />
-        </FormField>
-        <FormField label="Variante (optional)" htmlFor="variantLetter" error={errors.variantLetter?.message}>
-          <input
-            id="variantLetter"
-            className={`${inputClass} w-20 uppercase`}
-            maxLength={4}
-            {...register("variantLetter")}
-          />
-        </FormField>
-        <FormField label="Erstellt am" htmlFor="createdAt" error={errors.createdAt?.message}>
-          <input id="createdAt" type="date" className={inputClass} {...register("createdAt")} />
-        </FormField>
-      </div>
-
-      <FormField label="Bezeichnung (optional)" htmlFor="name">
+  const numberInput = (name: "caseQuantity" | "caseLoadCount", id: string) => (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field }) => (
         <input
-          id="name"
-          className={inputClass}
-          placeholder="sonst automatisch: Kaliber + Geschossgewicht + Geschoss"
-          {...register("name")}
+          id={id}
+          type="number"
+          step="1"
+          min="1"
+          inputMode="numeric"
+          className={`${inputClass} tabular-nums`}
+          value={field.value ?? ""}
+          onChange={(e) => field.onChange(e.target.value === "" ? null : Number(e.target.value))}
         />
-      </FormField>
+      )}
+    />
+  );
 
-      <FormField label="Waffe" htmlFor="firearmId" error={errors.firearmId?.message}>
-        <select id="firearmId" className={inputClass} {...register("firearmId")}>
-          {firearms.map((f) => (
-            <option key={f.id} value={f.id}>
-              {f.name} ({f.caliber})
-            </option>
-          ))}
-        </select>
-      </FormField>
+  const lengthInput = (
+    name: "oalMm" | "cbtoMm" | "caseTrimLengthMm" | "shoulderBumpMm" | "bushingDiameterMm" | "mandrelDiameterMm"
+  ) => (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field }) => <UnitValueInput id={name} kind="length" value={field.value} onChange={field.onChange} />}
+    />
+  );
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <FormField label="Zündhütchen" htmlFor="primer">
-          <ComboboxInput id="primer" options={knownPrimers} placeholder="z.B. CCI BR-2" {...register("primer")} />
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <FormSection title="Allgemein">
+        <div className="col-span-full grid grid-cols-2 gap-4 @md:grid-cols-[8rem_8rem_1fr]">
+          <FormField label="Ladungsnummer" htmlFor="loadNumber" error={errors.loadNumber?.message}>
+            <Controller
+              control={control}
+              name="loadNumber"
+              render={({ field }) => (
+                <input
+                  id="loadNumber"
+                  type="number"
+                  step="1"
+                  min="1"
+                  inputMode="numeric"
+                  className={`${inputClass} tabular-nums`}
+                  value={field.value ?? ""}
+                  onChange={(e) => field.onChange(e.target.value === "" ? "" : Number(e.target.value))}
+                />
+              )}
+            />
+          </FormField>
+          <FormField label="Variante" htmlFor="variantLetter" error={errors.variantLetter?.message}>
+            <input
+              id="variantLetter"
+              className={`${inputClass} uppercase`}
+              maxLength={4}
+              placeholder="z.B. A"
+              {...register("variantLetter")}
+            />
+          </FormField>
+          <FormField label="Erstellt am" htmlFor="createdAt" error={errors.createdAt?.message} className="col-span-2 @md:col-span-1">
+            <input id="createdAt" type="date" className={inputClass} {...register("createdAt")} />
+          </FormField>
+        </div>
+
+        <FormField label="Waffe" htmlFor="firearmId" error={errors.firearmId?.message}>
+          <select id="firearmId" className={inputClass} {...register("firearmId")}>
+            {firearms.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name} ({f.caliber})
+              </option>
+            ))}
+          </select>
         </FormField>
 
+        <FormField
+          label="Bezeichnung"
+          htmlFor="name"
+          hint="Optional — sonst automatisch aus Kaliber, Geschossgewicht und Geschoss."
+        >
+          <input id="name" className={inputClass} placeholder="automatisch" {...register("name")} />
+        </FormField>
+      </FormSection>
+
+      <FormSection title="Komponenten">
         <FormField label="Pulver" htmlFor="powder">
           <ComboboxInput id="powder" options={knownPowders} placeholder="z.B. Vihtavuori N150" {...register("powder")} />
         </FormField>
@@ -202,143 +229,64 @@ export function LoadForm({
           />
         </FormField>
 
+        <FormField label="Zündhütchen" htmlFor="primer">
+          <ComboboxInput id="primer" options={knownPrimers} placeholder="z.B. CCI BR-2" {...register("primer")} />
+        </FormField>
+      </FormSection>
+
+      <FormSection title="Patrone">
         <FormField label="OAL (Gesamtlänge)" htmlFor="oalMm">
-          <Controller
-            control={control}
-            name="oalMm"
-            render={({ field }) => (
-              <UnitValueInput id="oalMm" kind="length" value={field.value} onChange={field.onChange} />
-            )}
-          />
+          {lengthInput("oalMm")}
         </FormField>
-
         <FormField label="CBTO" htmlFor="cbtoMm">
-          <Controller
-            control={control}
-            name="cbtoMm"
-            render={({ field }) => (
-              <UnitValueInput id="cbtoMm" kind="length" value={field.value} onChange={field.onChange} />
-            )}
-          />
+          {lengthInput("cbtoMm")}
         </FormField>
-      </div>
+        <FormField label="Crimp" htmlFor="crimpInfo" className="@md:col-span-2">
+          <input id="crimpInfo" className={inputClass} {...register("crimpInfo")} />
+        </FormField>
+      </FormSection>
 
-      <FormField label="Crimp" htmlFor="crimpInfo">
-        <input id="crimpInfo" className={inputClass} {...register("crimpInfo")} />
-      </FormField>
+      <FormSection title="Hülsenvorbereitung">
+        <FormField label="Hülsen-Marke" htmlFor="caseBrand">
+          <input id="caseBrand" className={inputClass} placeholder="z.B. Lapua" {...register("caseBrand")} />
+        </FormField>
+        <FormField label="Anzahl (Stück)" htmlFor="caseQuantity">
+          {numberInput("caseQuantity", "caseQuantity")}
+        </FormField>
+        <FormField label="Load Count (Wiederladungen)" htmlFor="caseLoadCount">
+          {numberInput("caseLoadCount", "caseLoadCount")}
+        </FormField>
+        <FormField label="Trimmlänge" htmlFor="caseTrimLengthMm">
+          {lengthInput("caseTrimLengthMm")}
+        </FormField>
+        <FormField label="Matrize (Kalibrierung)" htmlFor="sizingDie">
+          <input id="sizingDie" className={inputClass} placeholder="z.B. Redding S-Type FL" {...register("sizingDie")} />
+        </FormField>
+        <FormField label="Shoulder Bump" htmlFor="shoulderBumpMm">
+          {lengthInput("shoulderBumpMm")}
+        </FormField>
+        <FormField label="Bushing (Durchmesser)" htmlFor="bushingDiameterMm">
+          {lengthInput("bushingDiameterMm")}
+        </FormField>
+        <FormField label="Expander Mandrel (Durchmesser)" htmlFor="mandrelDiameterMm">
+          {lengthInput("mandrelDiameterMm")}
+        </FormField>
+      </FormSection>
 
-      <fieldset className="flex flex-col gap-4 rounded-md border border-neutral-200 p-4 dark:border-neutral-800">
-        <legend className="px-1 text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Hülsenvorbereitung
-        </legend>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField label="Hülse – Marke" htmlFor="caseBrand">
-            <input id="caseBrand" className={inputClass} {...register("caseBrand")} />
-          </FormField>
-
-          <FormField label="Hülse – Anzahl (Stück)" htmlFor="caseQuantity">
-            <Controller
-              control={control}
-              name="caseQuantity"
-              render={({ field }) => (
-                <input
-                  id="caseQuantity"
-                  type="number"
-                  step="1"
-                  min="1"
-                  inputMode="numeric"
-                  className={inputClass}
-                  value={field.value ?? ""}
-                  onChange={(e) => field.onChange(e.target.value === "" ? null : Number(e.target.value))}
-                />
-              )}
-            />
-          </FormField>
-
-          <FormField label="Hülse – Load Count (Wiederladungen)" htmlFor="caseLoadCount">
-            <Controller
-              control={control}
-              name="caseLoadCount"
-              render={({ field }) => (
-                <input
-                  id="caseLoadCount"
-                  type="number"
-                  step="1"
-                  min="1"
-                  inputMode="numeric"
-                  className={inputClass}
-                  value={field.value ?? ""}
-                  onChange={(e) => field.onChange(e.target.value === "" ? null : Number(e.target.value))}
-                />
-              )}
-            />
-          </FormField>
-
-          <FormField label="Hülse – Trimmlänge" htmlFor="caseTrimLengthMm">
-            <Controller
-              control={control}
-              name="caseTrimLengthMm"
-              render={({ field }) => (
-                <UnitValueInput id="caseTrimLengthMm" kind="length" value={field.value} onChange={field.onChange} />
-              )}
-            />
-          </FormField>
-
-          <FormField label="Matrize (Kalibrierung)" htmlFor="sizingDie">
-            <input
-              id="sizingDie"
-              className={inputClass}
-              placeholder="z.B. Redding S-Type FL"
-              {...register("sizingDie")}
-            />
-          </FormField>
-
-          <FormField label="Shoulder Bump" htmlFor="shoulderBumpMm">
-            <Controller
-              control={control}
-              name="shoulderBumpMm"
-              render={({ field }) => (
-                <UnitValueInput id="shoulderBumpMm" kind="length" value={field.value} onChange={field.onChange} />
-              )}
-            />
-          </FormField>
-
-          <FormField label="Bushing (Durchmesser)" htmlFor="bushingDiameterMm">
-            <Controller
-              control={control}
-              name="bushingDiameterMm"
-              render={({ field }) => (
-                <UnitValueInput id="bushingDiameterMm" kind="length" value={field.value} onChange={field.onChange} />
-              )}
-            />
-          </FormField>
-
-          <FormField label="Expander Mandrel (Durchmesser)" htmlFor="mandrelDiameterMm">
-            <Controller
-              control={control}
-              name="mandrelDiameterMm"
-              render={({ field }) => (
-                <UnitValueInput id="mandrelDiameterMm" kind="length" value={field.value} onChange={field.onChange} />
-              )}
-            />
-          </FormField>
+      <FormSection title="Notizen">
+        <div className="col-span-full">
+          <textarea id="notes" aria-label="Notizen" rows={3} className={textareaClass} {...register("notes")} />
         </div>
-      </fieldset>
+      </FormSection>
 
-      <FormField label="Notizen" htmlFor="notes">
-        <textarea id="notes" rows={3} className={inputClass} {...register("notes")} />
-      </FormField>
-
-      {serverError && <p className="text-sm text-red-600">{serverError}</p>}
-
-      <div className="flex gap-2">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Speichern…" : "Speichern"}
+      <FormActions sticky error={serverError}>
+        <Button type="submit" disabled={isSubmitting} icon="check">
+          {isSubmitting ? "Speichern…" : load ? "Änderungen speichern" : "Ladung anlegen"}
         </Button>
-        <Button type="button" variant="secondary" onClick={() => router.back()}>
+        <Button type="button" variant="ghost" onClick={() => router.back()}>
           Abbrechen
         </Button>
-      </div>
+      </FormActions>
     </form>
   );
 }

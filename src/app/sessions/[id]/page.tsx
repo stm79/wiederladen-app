@@ -1,12 +1,14 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { SessionForm } from "@/components/forms/SessionForm";
 import { DeleteButton } from "@/components/ui/DeleteButton";
 import { AddShotGroupSection } from "@/components/sessions/AddShotGroupSection";
 import { GroupCard } from "@/components/sessions/GroupCard";
-import { Button } from "@/components/ui/Button";
+import { SessionDetailsCard } from "@/components/sessions/SessionDetailsCard";
+import { LinkButton } from "@/components/ui/Button";
+import { EmptyState, PageHeader, Section } from "@/components/ui/Layout";
+import { Icon } from "@/components/ui/Icon";
 import { deleteSession } from "@/app/actions/sessions";
-import { loadDisplayName } from "@/lib/loads/label";
+import { formatDateLong } from "@/lib/format-date";
 
 export default async function SessionDetailPage({
   params,
@@ -20,7 +22,7 @@ export default async function SessionDetailPage({
       where: { id },
       include: {
         sessionLoads: { include: { load: { include: { firearm: { select: { caliber: true } } } } } },
-        sessionFirearms: true,
+        sessionFirearms: { include: { firearm: { select: { name: true } } } },
         groups: {
           include: { images: true, velocitySets: { include: { shots: true }, orderBy: { importedAt: "desc" } } },
           orderBy: { createdAt: "desc" },
@@ -38,61 +40,72 @@ export default async function SessionDetailPage({
 
   const allLoads = allLoadsRaw.map((load) => ({ ...load, caliber: load.firearm.caliber }));
   const sessionLoadOptions = session.sessionLoads.map((sl) => ({ ...sl.load, caliber: sl.load.firearm.caliber }));
-  const loadLabel = (loadId: string | null) => {
+  const findLoad = (loadId: string | null) => {
     if (!loadId) return null;
-    const load = sessionLoadOptions.find((l) => l.id === loadId) ?? allLoads.find((l) => l.id === loadId);
-    if (!load) return null;
-    return loadDisplayName(load);
+    return sessionLoadOptions.find((l) => l.id === loadId) ?? allLoads.find((l) => l.id === loadId) ?? null;
   };
+  const groupLoadOptions = sessionLoadOptions.length > 0 ? sessionLoadOptions : allLoads;
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-6 sm:flex-row sm:justify-between">
-        <div className="max-w-2xl flex-1">
-          <h1 className="mb-4 text-xl font-semibold">Session bearbeiten</h1>
-          <SessionForm firearms={firearms} loads={allLoads} session={session} />
-        </div>
-        <div className="flex shrink-0 flex-col gap-2">
-          <a href={`/api/export/pdf/sessions/${session.id}`} className="text-center">
-            <Button type="button" variant="secondary" className="w-full">
-              PDF-Bericht
-            </Button>
-          </a>
-          <DeleteButton
-            id={session.id}
-            action={deleteSession}
-            redirectTo="/sessions"
-            confirmMessage="Diese Session inkl. aller Schussgruppen und Bilder wirklich löschen?"
+      <PageHeader
+        back={{ href: "/sessions", label: "Sessions" }}
+        title={formatDateLong(session.date)}
+        subtitle={
+          session.location && (
+            <span className="inline-flex items-center gap-1.5">
+              <Icon name="mapPin" size={15} className="text-neutral-400" />
+              {session.location}
+            </span>
+          )
+        }
+        actions={
+          <>
+            <LinkButton href={`/api/export/pdf/sessions/${session.id}`} variant="secondary" icon="file" external>
+              PDF
+            </LinkButton>
+            <DeleteButton
+              id={session.id}
+              action={deleteSession}
+              redirectTo="/sessions"
+              confirmMessage="Diese Session inkl. aller Schussgruppen und Bilder wirklich löschen?"
+            />
+          </>
+        }
+      />
+
+      <SessionDetailsCard
+        firearms={firearms}
+        loads={allLoads}
+        session={session}
+        firearmNames={session.sessionFirearms.map((sf) => sf.firearm.name)}
+      />
+
+      <Section title={`Schussgruppen${session.groups.length > 0 ? ` (${session.groups.length})` : ""}`}>
+        {session.groups.length === 0 && (
+          <EmptyState
+            icon="crosshair"
+            title="Noch keine Schussgruppen"
+            description="Lege eine Gruppe an und füge dann ein Foto zur Vermessung oder Chrono-Daten hinzu."
           />
-        </div>
-      </div>
+        )}
 
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Schussgruppen</h2>
-        </div>
+        <AddShotGroupSection sessionId={session.id} loads={groupLoadOptions} />
 
-        {session.groups.length === 0 ? (
-          <p className="text-sm text-neutral-500">Noch keine Schussgruppen für diese Session.</p>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
+        {session.groups.length > 0 && (
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
             {session.groups.map((group) => (
               <GroupCard
                 key={group.id}
                 sessionId={session.id}
                 group={group}
-                loadLabel={loadLabel(group.loadId)}
-                loads={sessionLoadOptions.length > 0 ? sessionLoadOptions : allLoads}
+                load={findLoad(group.loadId)}
+                loads={groupLoadOptions}
               />
             ))}
           </div>
         )}
-
-        <AddShotGroupSection
-          sessionId={session.id}
-          loads={sessionLoadOptions.length > 0 ? sessionLoadOptions : allLoads}
-        />
-      </div>
+      </Section>
     </div>
   );
 }

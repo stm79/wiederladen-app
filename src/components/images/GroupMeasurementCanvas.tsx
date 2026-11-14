@@ -147,7 +147,7 @@ export function GroupMeasurementCanvas({ sessionId, groupId, image }: GroupMeasu
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="max-w-xl overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-800">
+      <div className="max-w-xl overflow-hidden rounded-xl border border-neutral-200/80 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
         <canvas
           ref={canvasRef}
           width={image.width}
@@ -159,8 +159,8 @@ export function GroupMeasurementCanvas({ sessionId, groupId, image }: GroupMeasu
       </div>
 
       {!calibrationConfirmed ? (
-        <div className="flex flex-col gap-3 rounded-md border border-neutral-200 p-4 dark:border-neutral-800">
-          <p className="text-sm font-medium">
+        <div className="flex max-w-xl flex-col gap-3 rounded-xl border border-neutral-200/80 bg-white p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+          <p className="text-sm font-semibold">
             Schritt 1: Kalibrierung — markiere zwei Punkte mit bekanntem Abstand auf dem Bild
             (z.B. Kanten eines Ziel-Quadrats oder ein Lineal).
           </p>
@@ -191,8 +191,8 @@ export function GroupMeasurementCanvas({ sessionId, groupId, image }: GroupMeasu
           )}
         </div>
       ) : (
-        <div className="flex flex-col gap-3 rounded-md border border-neutral-200 p-4 dark:border-neutral-800">
-          <p className="text-sm font-medium">
+        <div className="flex max-w-xl flex-col gap-3 rounded-xl border border-neutral-200/80 bg-white p-4 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+          <p className="text-sm font-semibold">
             Schritt 2: Einschüsse markieren — auf jedes Loch tippen/klicken.
           </p>
           <p className="text-xs text-neutral-500">{shotPoints.length} Einschüsse markiert.</p>

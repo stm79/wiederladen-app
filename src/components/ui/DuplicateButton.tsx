@@ -15,6 +15,8 @@ export function DuplicateButton({ id }: { id: string }) {
       <Button
         type="button"
         variant="secondary"
+        icon="copy"
+        title="Neue Variante dieser Ladung anlegen (alle Werte übernommen)"
         disabled={isPending}
         onClick={() => {
           setError(null);
@@ -33,7 +35,7 @@ export function DuplicateButton({ id }: { id: string }) {
           });
         }}
       >
-        {isPending ? "Duplizieren…" : "Duplizieren als Basis"}
+        {isPending ? "Duplizieren…" : "Als Variante kopieren"}
       </Button>
       {error && <span className="text-xs text-red-600">{error}</span>}
     </div>

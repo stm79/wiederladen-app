@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { FirearmForm } from "@/components/forms/FirearmForm";
 import { DeleteButton } from "@/components/ui/DeleteButton";
+import { LinkButton } from "@/components/ui/Button";
+import { Card, EmptyState, ListCard, ListRow, LoadNumberBadge, PageHeader, Section } from "@/components/ui/Layout";
 import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
 import { LadderChart } from "@/components/charts/LadderChart";
 import { deleteFirearm } from "@/app/actions/firearms";
@@ -45,69 +46,91 @@ export default async function FirearmDetailPage({
       }));
   });
 
+  const specs = [firearm.caliber, firearm.twistRate ? `Drall ${firearm.twistRate}` : null].filter(Boolean);
+
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-6 sm:flex-row sm:justify-between">
-        <div className="max-w-lg flex-1">
-          <h1 className="mb-4 text-xl font-semibold">Waffe bearbeiten</h1>
-          <FirearmForm firearm={firearm} knownCalibers={knownCalibers} />
-        </div>
-        <div className="shrink-0">
-          <DeleteButton
-            id={firearm.id}
-            action={deleteFirearm}
-            redirectTo="/firearms"
-            confirmMessage={`"${firearm.name}" wirklich löschen? Zugehörige Ladedaten werden ebenfalls gelöscht.`}
-          />
-        </div>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        back={{ href: "/firearms", label: "Waffen" }}
+        title={firearm.name}
+        subtitle={
+          <span className="flex flex-wrap gap-x-1">
+            {specs.join(" · ")}
+            {firearm.barrelLenMm != null && (
+              <span>
+                · Lauf <UnitValueDisplay kind="length" value={firearm.barrelLenMm} fractionDigits={0} />
+              </span>
+            )}
+          </span>
+        }
+        actions={
+          <>
+            <LinkButton href={`/loads/new?firearmId=${firearm.id}`} icon="plus">
+              Neue Ladung
+            </LinkButton>
+            <DeleteButton
+              id={firearm.id}
+              action={deleteFirearm}
+              redirectTo="/firearms"
+              confirmMessage={`"${firearm.name}" wirklich löschen? Zugehörige Ladedaten werden ebenfalls gelöscht.`}
+            />
+          </>
+        }
+      />
 
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Ladedaten für diese Waffe</h2>
-          <Link href={`/loads/new?firearmId=${firearm.id}`} className="text-sm text-neutral-500 underline">
-            + Neue Ladung
-          </Link>
-        </div>
-        {firearm.loads.length === 0 ? (
-          <p className="text-sm text-neutral-500">Noch keine Ladedaten für diese Waffe.</p>
-        ) : (
-          <div className="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-800">
-            {firearm.loads.map((load) => (
-              <Link
-                key={load.id}
-                href={`/loads/${load.id}`}
-                className="flex items-center justify-between py-3 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-              >
-                <div>
-                  <div className="font-medium">
-                    <span className="mr-2 text-neutral-400 tabular-nums">
-                      {formatLoadNumber(load.loadNumber, load.variantLetter)}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start">
+        <div className="flex min-w-0 flex-col gap-8">
+          <Section title="Ladedaten">
+            {firearm.loads.length === 0 ? (
+              <EmptyState
+                icon="flask"
+                title="Noch keine Ladedaten für diese Waffe"
+                action={
+                  <LinkButton href={`/loads/new?firearmId=${firearm.id}`} variant="secondary" icon="plus">
+                    Neue Ladung
+                  </LinkButton>
+                }
+              />
+            ) : (
+              <ListCard>
+                {firearm.loads.map((load) => (
+                  <ListRow key={load.id} href={`/loads/${load.id}`}>
+                    <LoadNumberBadge>{formatLoadNumber(load.loadNumber, load.variantLetter)}</LoadNumberBadge>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-medium">
+                        {loadDisplayName({
+                          name: load.name,
+                          caliber: firearm.caliber,
+                          bulletWeightGr: load.bulletWeightGr,
+                          bullet: load.bullet,
+                        })}
+                      </div>
+                      {load.powder && (
+                        <div className="truncate text-sm text-neutral-500 dark:text-neutral-400">{load.powder}</div>
+                      )}
+                    </div>
+                    <span className="shrink-0 text-sm font-medium tabular-nums">
+                      <UnitValueDisplay kind="weight" value={load.chargeGrains} />
                     </span>
-                    {loadDisplayName({
-                      name: load.name,
-                      caliber: firearm.caliber,
-                      bulletWeightGr: load.bulletWeightGr,
-                      bullet: load.bullet,
-                    })}
-                  </div>
-                  <div className="text-sm text-neutral-500">
-                    {load.bulletWeightGr ? load.bullet : null}
-                  </div>
-                </div>
-                <UnitValueDisplay kind="weight" value={load.chargeGrains} />
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+                  </ListRow>
+                ))}
+              </ListCard>
+            )}
+          </Section>
 
-      {ladderPoints.length > 0 && (
-        <div>
-          <h2 className="mb-3 text-lg font-semibold">Geschwindigkeit vs. Ladungsmenge</h2>
-          <LadderChart points={ladderPoints} />
+          {ladderPoints.length > 0 && (
+            <Section title="Geschwindigkeit vs. Ladungsmenge">
+              <Card>
+                <LadderChart points={ladderPoints} />
+              </Card>
+            </Section>
+          )}
         </div>
-      )}
+
+        <Section title="Daten bearbeiten">
+          <FirearmForm firearm={firearm} knownCalibers={knownCalibers} />
+        </Section>
+      </div>
     </div>
   );
 }

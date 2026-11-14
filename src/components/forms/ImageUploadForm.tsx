@@ -45,10 +45,12 @@ export function ImageUploadForm({ groupId }: { groupId: string }) {
       <Button
         type="button"
         variant="secondary"
+        size="sm"
+        icon="image"
         disabled={isUploading}
         onClick={() => inputRef.current?.click()}
       >
-        {isUploading ? "Wird hochgeladen…" : "+ Bild hinzufügen"}
+        {isUploading ? "Wird hochgeladen…" : "Foto"}
       </Button>
       {error && <span className="text-xs text-red-600">{error}</span>}
     </div>

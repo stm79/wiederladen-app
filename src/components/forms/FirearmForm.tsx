@@ -6,7 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { firearmSchema, type FirearmInput } from "@/lib/validation/firearm";
 import { createFirearm, updateFirearm } from "@/app/actions/firearms";
-import { FormField, inputClass } from "@/components/forms/FormField";
+import { FormActions, FormField, FormSection, inputClass, textareaClass } from "@/components/forms/FormField";
 import { ComboboxInput } from "@/components/forms/ComboboxInput";
 import { UnitValueInput } from "@/components/units/UnitValueInput";
 import { Button } from "@/components/ui/Button";
@@ -68,53 +68,48 @@ export function FirearmForm({ knownCalibers, firearm }: FirearmFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex max-w-lg flex-col gap-4">
-      <FormField label="Name" htmlFor="name" error={errors.name?.message}>
-        <input id="name" className={inputClass} placeholder='z.B. "Tikka T3x .308"' {...register("name")} />
-      </FormField>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <FormSection title="Waffe">
+        <FormField label="Name" htmlFor="name" error={errors.name?.message}>
+          <input id="name" className={inputClass} placeholder='z.B. "Tikka T3x"' {...register("name")} />
+        </FormField>
 
-      <FormField label="Kaliber" htmlFor="caliber" error={errors.caliber?.message}>
-        <ComboboxInput
-          id="caliber"
-          options={knownCalibers}
-          placeholder="z.B. .308 Winchester"
-          {...register("caliber")}
-        />
-      </FormField>
+        <FormField label="Kaliber" htmlFor="caliber" error={errors.caliber?.message}>
+          <ComboboxInput
+            id="caliber"
+            options={knownCalibers}
+            placeholder="z.B. .308 Winchester"
+            {...register("caliber")}
+          />
+        </FormField>
 
-      <FormField label="Lauflänge" htmlFor="barrelLenMm" error={errors.barrelLenMm?.message}>
-        <Controller
-          control={control}
-          name="barrelLenMm"
-          render={({ field }) => (
-            <UnitValueInput
-              id="barrelLenMm"
-              kind="length"
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
-      </FormField>
+        <FormField label="Lauflänge" htmlFor="barrelLenMm" error={errors.barrelLenMm?.message}>
+          <Controller
+            control={control}
+            name="barrelLenMm"
+            render={({ field }) => (
+              <UnitValueInput id="barrelLenMm" kind="length" value={field.value} onChange={field.onChange} />
+            )}
+          />
+        </FormField>
 
-      <FormField label="Drall (z.B. 1:8)" htmlFor="twistRate">
-        <input id="twistRate" className={inputClass} {...register("twistRate")} />
-      </FormField>
+        <FormField label="Drall" htmlFor="twistRate">
+          <input id="twistRate" className={inputClass} placeholder="z.B. 1:8" {...register("twistRate")} />
+        </FormField>
 
-      <FormField label="Notizen" htmlFor="notes">
-        <textarea id="notes" rows={3} className={inputClass} {...register("notes")} />
-      </FormField>
+        <FormField label="Notizen" htmlFor="notes" className="@md:col-span-2">
+          <textarea id="notes" rows={3} className={textareaClass} {...register("notes")} />
+        </FormField>
+      </FormSection>
 
-      {serverError && <p className="text-sm text-red-600">{serverError}</p>}
-
-      <div className="flex gap-2">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Speichern…" : "Speichern"}
+      <FormActions error={serverError}>
+        <Button type="submit" disabled={isSubmitting} icon="check">
+          {isSubmitting ? "Speichern…" : firearm ? "Änderungen speichern" : "Waffe anlegen"}
         </Button>
-        <Button type="button" variant="secondary" onClick={() => router.back()}>
+        <Button type="button" variant="ghost" onClick={() => router.back()}>
           Abbrechen
         </Button>
-      </div>
+      </FormActions>
     </form>
   );
 }

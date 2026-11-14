@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { EmptyState, PageHeader } from "@/components/ui/Layout";
 import { GroupMeasurementCanvas } from "@/components/images/GroupMeasurementCanvas";
 import type { Point } from "@/lib/group-measurement/metrics";
 
@@ -25,26 +26,16 @@ export default async function MeasureGroupPage({
 
   if (!image) {
     return (
-      <div className="flex flex-col gap-4">
-        <h1 className="text-xl font-semibold">Schussgruppe vermessen</h1>
-        <p className="text-sm text-neutral-500">
-          Für diese Gruppe wurde noch kein Bild hochgeladen.
-        </p>
-        <Link href={`/sessions/${sessionId}`} className="text-sm underline">
-          Zurück zur Session
-        </Link>
+      <div className="flex flex-col gap-6">
+        <PageHeader back={{ href: `/sessions/${sessionId}`, label: "Zurück zur Session" }} title="Schussgruppe vermessen" />
+        <EmptyState icon="image" title="Noch kein Bild" description="Für diese Gruppe wurde noch kein Bild hochgeladen." />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Schussgruppe vermessen</h1>
-        <Link href={`/sessions/${sessionId}`} className="text-sm text-neutral-500 underline">
-          Zurück zur Session
-        </Link>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader back={{ href: `/sessions/${sessionId}`, label: "Zurück zur Session" }} title="Schussgruppe vermessen" />
 
       {group.images.length > 1 && (
         <div className="flex flex-wrap gap-2">
@@ -54,8 +45,8 @@ export default async function MeasureGroupPage({
               href={`/sessions/${sessionId}/groups/${groupId}/measure?imageId=${img.id}`}
               className={
                 img.id === image.id
-                  ? "rounded-md border border-neutral-900 px-2 py-1 text-xs dark:border-white"
-                  : "rounded-md border border-neutral-200 px-2 py-1 text-xs text-neutral-500 dark:border-neutral-800"
+                  ? "rounded-lg border border-brand bg-brand-soft px-3 py-1.5 text-xs font-medium"
+                  : "rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs text-neutral-500 hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900"
               }
             >
               Bild {group.images.indexOf(img) + 1}

@@ -44,7 +44,8 @@ export function TemperatureVelocityChart({ points }: { points: TemperaturePoint[
             tick={{ fill: CHART_MUTED, fontSize: 12 }}
             stroke={CHART_AXIS}
             tickLine={false}
-            domain={["dataMin - 2", "dataMax + 2"]}
+            domain={[(min: number) => Math.floor(min - 2), (max: number) => Math.ceil(max + 2)]}
+            allowDecimals={false}
           />
           <YAxis
             type="number"
@@ -54,7 +55,9 @@ export function TemperatureVelocityChart({ points }: { points: TemperaturePoint[
             tick={{ fill: CHART_MUTED, fontSize: 12 }}
             stroke={CHART_AXIS}
             tickLine={false}
-            domain={["dataMin - 5", "dataMax + 5"]}
+            domain={[(min: number) => Math.floor(min - 5), (max: number) => Math.ceil(max + 5)]}
+            width={72}
+            tickFormatter={(v: number) => String(Math.round(v))}
           />
           <Tooltip
             cursor={{ strokeDasharray: "0" }}

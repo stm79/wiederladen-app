@@ -28,8 +28,8 @@ export default async function LoadLabelPage({
         @media print { body { margin: 0; } }
       `}</style>
 
-      <div className="flex w-full max-w-md items-center justify-between print:hidden">
-        <Link href={`/loads/${load.id}`} className="text-sm text-neutral-500 underline">
+      <div className="flex w-full max-w-md items-center justify-between rounded-xl border border-neutral-200/80 bg-white p-3 shadow-xs print:hidden dark:border-neutral-800 dark:bg-neutral-900">
+        <Link href={`/loads/${load.id}`} className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-white">
           Zurück zur Ladung
         </Link>
         <PrintButton />

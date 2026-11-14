@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/ui/Layout";
 import { FirearmForm } from "@/components/forms/FirearmForm";
 import { getKnownCalibers } from "@/lib/firearms/distinct-values";
 
@@ -9,8 +10,8 @@ export default async function NewFirearmPage() {
   const knownCalibers = await getKnownCalibers();
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Neue Waffe</h1>
+    <div className="flex max-w-2xl flex-col gap-6">
+      <PageHeader back={{ href: "/firearms", label: "Waffen" }} title="Neue Waffe" />
       <FirearmForm knownCalibers={knownCalibers} />
     </div>
   );

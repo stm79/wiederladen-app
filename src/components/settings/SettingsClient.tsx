@@ -1,37 +1,73 @@
 "use client";
 
-import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useUnits } from "@/components/units/UnitProvider";
 import type { LengthUnit, VelocityUnit, WeightUnit } from "@/lib/units/types";
 import { RestoreBackupForm } from "@/components/settings/RestoreBackupForm";
 import { ChecklistStepsManager } from "@/components/settings/ChecklistStepsManager";
 import { APP_VERSION } from "@/lib/version";
+import { LinkButton } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
+import { Card, PageHeader, Section } from "@/components/ui/Layout";
 
-function OptionButton<T extends string>({
-  value,
-  current,
+function Segmented<T extends string>({
   label,
-  onClick,
+  description,
+  value,
+  options,
+  onChange,
 }: {
-  value: T;
-  current: T;
   label: string;
-  onClick: (v: T) => void;
+  description?: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (v: T) => void;
 }) {
-  const active = value === current;
   return (
-    <button
-      type="button"
-      onClick={() => onClick(value)}
-      className={
-        active
-          ? "rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white dark:bg-neutral-100 dark:text-neutral-900"
-          : "rounded-md bg-neutral-100 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
-      }
+    <div className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <div className="text-sm font-medium">{label}</div>
+        {description && <div className="text-xs text-neutral-500 dark:text-neutral-400">{description}</div>}
+      </div>
+      <div role="radiogroup" aria-label={label} className="flex w-fit gap-0.5 rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800">
+        {options.map((o) => {
+          const active = o.value === value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              onClick={() => onChange(o.value)}
+              className={
+                active
+                  ? "rounded-md bg-white px-3 py-1.5 text-sm font-medium text-neutral-900 shadow-xs dark:bg-neutral-950 dark:text-white"
+                  : "rounded-md px-3 py-1.5 text-sm font-medium text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+              }
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function DownloadRow({ href, label, hint }: { href: string; label: string; hint?: string }) {
+  return (
+    <a
+      href={href}
+      className="group flex items-center gap-3 py-3 text-sm hover:text-neutral-900 dark:hover:text-white"
     >
-      {label}
-    </button>
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-500 group-hover:text-brand dark:bg-neutral-800 dark:text-neutral-400">
+        <Icon name="download" size={16} />
+      </span>
+      <span className="flex-1">
+        <span className="font-medium">{label}</span>
+        {hint && <span className="block text-xs text-neutral-500 dark:text-neutral-400">{hint}</span>}
+      </span>
+    </a>
   );
 }
 
@@ -40,144 +76,93 @@ export function SettingsClient({ checklistSteps }: { checklistSteps: { id: strin
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="flex max-w-md flex-col gap-8">
-      <h1 className="text-xl font-semibold">Einstellungen</h1>
+    <div className="flex max-w-2xl flex-col gap-8">
+      <PageHeader
+        title="Einstellungen"
+        subtitle={isSaving ? "Speichere…" : undefined}
+      />
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Darstellung</h2>
-        <div className="flex gap-2">
-          <OptionButton
-            value="system"
-            current={theme ?? "system"}
-            label="System"
-            onClick={setTheme}
+      <Section title="Darstellung & Einheiten" description="Einheiten lassen sich zusätzlich pro Eingabefeld umschalten.">
+        <Card className="divide-y divide-neutral-100 py-1 sm:py-1 dark:divide-neutral-800">
+          <Segmented
+            label="Design"
+            value={(theme ?? "system") as "system" | "light" | "dark"}
+            options={[
+              { value: "system", label: "System" },
+              { value: "light", label: "Hell" },
+              { value: "dark", label: "Dunkel" },
+            ]}
+            onChange={setTheme}
           />
-          <OptionButton
-            value="light"
-            current={theme ?? "system"}
-            label="Hell"
-            onClick={setTheme}
+          <Segmented<WeightUnit>
+            label="Gewicht"
+            description="Pulverladung, Geschossgewicht"
+            value={prefs.weightUnit}
+            options={[
+              { value: "grain", label: "Grain" },
+              { value: "gram", label: "Gramm" },
+            ]}
+            onChange={(weightUnit) => setPrefs({ ...prefs, weightUnit })}
           />
-          <OptionButton
-            value="dark"
-            current={theme ?? "system"}
-            label="Dunkel"
-            onClick={setTheme}
+          <Segmented<LengthUnit>
+            label="Länge"
+            description="OAL, CBTO, Lauflänge, Gruppengröße"
+            value={prefs.lengthUnit}
+            options={[
+              { value: "mm", label: "mm" },
+              { value: "in", label: "Zoll" },
+            ]}
+            onChange={(lengthUnit) => setPrefs({ ...prefs, lengthUnit })}
           />
-        </div>
-      </section>
+          <Segmented<VelocityUnit>
+            label="Geschwindigkeit"
+            value={prefs.velocityUnit}
+            options={[
+              { value: "mps", label: "m/s" },
+              { value: "fps", label: "fps" },
+            ]}
+            onChange={(velocityUnit) => setPrefs({ ...prefs, velocityUnit })}
+          />
+        </Card>
+      </Section>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Gewicht (Pulverladung, Geschossgewicht)
-        </h2>
-        <div className="flex gap-2">
-          <OptionButton<WeightUnit>
-            value="grain"
-            current={prefs.weightUnit}
-            label="Grain"
-            onClick={(weightUnit) => setPrefs({ ...prefs, weightUnit })}
-          />
-          <OptionButton<WeightUnit>
-            value="gram"
-            current={prefs.weightUnit}
-            label="Gramm"
-            onClick={(weightUnit) => setPrefs({ ...prefs, weightUnit })}
-          />
-        </div>
-      </section>
+      <Section
+        title="Wiederlade-Checkliste"
+        description="Diese Schritte lassen sich bei jeder Ladung einzeln abhaken."
+        action={
+          <LinkButton href="/checklist/label" variant="secondary" size="sm" icon="printer">
+            Etikett
+          </LinkButton>
+        }
+      >
+        <Card>
+          <ChecklistStepsManager steps={checklistSteps} />
+        </Card>
+      </Section>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Länge (OAL, CBTO, Lauflänge)
-        </h2>
-        <div className="flex gap-2">
-          <OptionButton<LengthUnit>
-            value="mm"
-            current={prefs.lengthUnit}
-            label="Millimeter"
-            onClick={(lengthUnit) => setPrefs({ ...prefs, lengthUnit })}
-          />
-          <OptionButton<LengthUnit>
-            value="in"
-            current={prefs.lengthUnit}
-            label="Zoll"
-            onClick={(lengthUnit) => setPrefs({ ...prefs, lengthUnit })}
-          />
-        </div>
-      </section>
+      <Section title="Export" description="CSV-Dateien, z.B. für Excel.">
+        <Card className="divide-y divide-neutral-100 py-1 sm:py-1 dark:divide-neutral-800">
+          <DownloadRow href="/api/export/loads" label="Ladedaten" />
+          <DownloadRow href="/api/export/sessions" label="Sessions" />
+          <DownloadRow href="/api/export/shot-groups" label="Schussgruppen" />
+          <DownloadRow href="/api/export/velocity-shots" label="Geschwindigkeitsmessungen" />
+        </Card>
+      </Section>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          Geschwindigkeit
-        </h2>
-        <div className="flex gap-2">
-          <OptionButton<VelocityUnit>
-            value="mps"
-            current={prefs.velocityUnit}
-            label="m/s"
-            onClick={(velocityUnit) => setPrefs({ ...prefs, velocityUnit })}
-          />
-          <OptionButton<VelocityUnit>
-            value="fps"
-            current={prefs.velocityUnit}
-            label="fps"
-            onClick={(velocityUnit) => setPrefs({ ...prefs, velocityUnit })}
-          />
-        </div>
-      </section>
+      <Section
+        title="Datensicherung"
+        description="Datenbank und Bilder zusammen ergeben ein vollständiges Backup — die Datenbank enthält nur Verweise auf die Bilddateien."
+      >
+        <Card className="divide-y divide-neutral-100 py-1 sm:py-1 dark:divide-neutral-800">
+          <DownloadRow href="/api/export/backup" label="Datenbank-Backup herunterladen" hint="SQLite-Datei (.db)" />
+          <DownloadRow href="/api/export/images" label="Alle Bilder herunterladen" hint="ZIP-Archiv" />
+          <div className="py-3">
+            <RestoreBackupForm />
+          </div>
+        </Card>
+      </Section>
 
-      {isSaving && <p className="text-xs text-neutral-400">Speichere…</p>}
-
-      <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6 dark:border-neutral-800">
-        <h2 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Wiederlade-Checkliste</h2>
-        <p className="text-xs text-neutral-400">
-          Diese Schritte lassen sich bei jeder Ladung einzeln abhaken.
-        </p>
-        <ChecklistStepsManager steps={checklistSteps} />
-        <Link href="/checklist/label" className="text-sm text-neutral-600 underline dark:text-neutral-400">
-          Als Etikett drucken (Hochkant)
-        </Link>
-      </section>
-
-      <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6 dark:border-neutral-800">
-        <h2 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Export</h2>
-        <div className="flex flex-col gap-2 text-sm">
-          <a href="/api/export/loads" className="text-neutral-600 underline dark:text-neutral-400">
-            Ladedaten als CSV herunterladen
-          </a>
-          <a href="/api/export/sessions" className="text-neutral-600 underline dark:text-neutral-400">
-            Sessions als CSV herunterladen
-          </a>
-          <a href="/api/export/velocity-shots" className="text-neutral-600 underline dark:text-neutral-400">
-            Geschwindigkeitsmessungen als CSV herunterladen
-          </a>
-          <a href="/api/export/shot-groups" className="text-neutral-600 underline dark:text-neutral-400">
-            Schussgruppen als CSV herunterladen
-          </a>
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-3 border-t border-neutral-200 pt-6 dark:border-neutral-800">
-        <h2 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Datensicherung</h2>
-        <div className="flex flex-col gap-2 text-sm">
-          <a href="/api/export/backup" className="text-neutral-600 underline dark:text-neutral-400">
-            Datenbank-Backup herunterladen
-          </a>
-          <a href="/api/export/images" className="text-neutral-600 underline dark:text-neutral-400">
-            Alle Bilder herunterladen (ZIP)
-          </a>
-          <p className="text-xs text-neutral-400">
-            Beide zusammen ergeben ein vollständiges Backup — die Datenbank enthält keine Bilddateien, nur
-            Verweise darauf.
-          </p>
-          <RestoreBackupForm />
-        </div>
-      </section>
-
-      <section className="border-t border-neutral-200 pt-6 dark:border-neutral-800">
-        <p className="text-xs text-neutral-400">Version {APP_VERSION}</p>
-      </section>
+      <p className="text-xs text-neutral-400">Wiederladen · Version {APP_VERSION}</p>
     </div>
   );
 }

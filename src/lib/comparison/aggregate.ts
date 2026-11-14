@@ -5,6 +5,9 @@ import { formatLoadNumber } from "@/lib/loads/variant-letter";
 export interface LoadComparisonRow {
   loadId: string;
   loadLabel: string;
+  /** Just the load number ("#001A") — for chart axes, where the full label
+   *  doesn't fit. Unique per load. */
+  loadNumberLabel: string;
   firearmId: string;
   firearmName: string;
   caliber: string;
@@ -47,6 +50,7 @@ export function buildComparisonRow(load: LoadForComparison): LoadComparisonRow {
   return {
     loadId: load.id,
     loadLabel: `${formatLoadNumber(load.loadNumber, load.variantLetter)} ${loadDisplayName(load)}`,
+    loadNumberLabel: formatLoadNumber(load.loadNumber, load.variantLetter),
     firearmId: load.firearmId,
     firearmName: load.firearmName,
     caliber: load.caliber,

@@ -9,6 +9,8 @@ import { parseChronoFile, commitVelocityImport } from "@/app/actions/chrono";
 import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
 import { FormField, inputClass } from "@/components/forms/FormField";
 import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
+import { Stat } from "@/components/ui/Layout";
 
 interface ImportWizardProps {
   groupId: string;
@@ -92,16 +94,26 @@ export function ImportWizard({ groupId, sessionId }: ImportWizardProps) {
   if (!detected) {
     return (
       <div className="flex flex-col gap-3">
-        <input
-          ref={inputRef}
-          type="file"
-          accept=".csv,.xlsx,.xls,text/csv"
-          disabled={isParsing}
-          onChange={(e) => handleFile(e.target.files)}
-          className="text-sm text-neutral-600 file:mr-3 file:rounded-md file:border-0 file:bg-neutral-900 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white dark:text-neutral-400 dark:file:bg-neutral-100 dark:file:text-neutral-900"
-        />
-        {isParsing && <span className="text-sm text-neutral-400">Datei wird gelesen…</span>}
-        {error && <span className="text-sm text-red-600">{error}</span>}
+        <label
+          className={`flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed border-neutral-300 bg-white px-6 py-12 text-center transition-colors hover:border-brand hover:bg-brand-soft/40 dark:border-neutral-700 dark:bg-neutral-900 ${isParsing ? "pointer-events-none opacity-60" : ""}`}
+        >
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 dark:bg-neutral-800">
+            <Icon name="upload" size={22} />
+          </span>
+          <span className="font-medium">{isParsing ? "Datei wird gelesen…" : "Datei auswählen"}</span>
+          <span className="text-sm text-neutral-500 dark:text-neutral-400">
+            CSV oder Excel — LabRadar, Garmin Xero, MagnetoSpeed oder beliebige Tabelle
+          </span>
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".csv,.xlsx,.xls,text/csv"
+            disabled={isParsing}
+            onChange={(e) => handleFile(e.target.files)}
+            className="sr-only"
+          />
+        </label>
+        {error && <span className="text-sm font-medium text-red-600">{error}</span>}
       </div>
     );
   }
@@ -109,17 +121,17 @@ export function ImportWizard({ groupId, sessionId }: ImportWizardProps) {
   if (!selectedSeries || !mapping) {
     return (
       <div className="flex flex-col gap-4">
-        <div className="rounded-md border border-neutral-200 p-3 text-sm dark:border-neutral-800">
+        <div className="rounded-xl border border-brand/30 bg-brand-soft/60 p-3 text-sm">
           Format erkannt: <strong>{detected.label}</strong> — diese Datei enthält mehrere Serien. Welche soll
           importiert werden?
         </div>
-        <div className="flex flex-col divide-y divide-neutral-200 rounded-md border border-neutral-200 dark:divide-neutral-800 dark:border-neutral-800">
+        <div className="flex flex-col divide-y divide-neutral-100 overflow-hidden rounded-xl border border-neutral-200/80 bg-white dark:divide-neutral-800 dark:border-neutral-800 dark:bg-neutral-900">
           {detected.series.map((series) => (
             <button
               key={series.id}
               type="button"
               onClick={() => chooseSeries(series)}
-              className="px-4 py-2 text-left text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              className="px-4 py-3 text-left text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-800/60"
             >
               {series.label}
             </button>
@@ -134,7 +146,7 @@ export function ImportWizard({ groupId, sessionId }: ImportWizardProps) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="rounded-md border border-neutral-200 p-3 text-sm dark:border-neutral-800">
+      <div className="rounded-xl border border-brand/30 bg-brand-soft/60 p-3 text-sm">
         {detected.confidence === "high" ? (
           <span>
             Format erkannt: <strong>{detected.label}</strong> — bitte Spaltenzuordnung trotzdem prüfen.
@@ -196,10 +208,10 @@ export function ImportWizard({ groupId, sessionId }: ImportWizardProps) {
         </FormField>
       </div>
 
-      <div className="overflow-x-auto rounded-md border border-neutral-200 dark:border-neutral-800">
+      <div className="overflow-x-auto rounded-xl border border-neutral-200/80 bg-white dark:border-neutral-800 dark:bg-neutral-900">
         <table className="w-full min-w-[400px] text-sm">
           <thead>
-            <tr className="border-b border-neutral-200 bg-neutral-50 text-left dark:border-neutral-800 dark:bg-neutral-900">
+            <tr className="border-b border-neutral-200 bg-neutral-50/80 text-left text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900">
               {selectedSeries.table.headers.map((h, i) => (
                 <th key={i} className="px-3 py-1.5 font-medium">
                   {h || `Spalte ${i + 1}`}
@@ -226,20 +238,17 @@ export function ImportWizard({ groupId, sessionId }: ImportWizardProps) {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-6 text-sm">
-        <span>{shots.length} gültige Schuss erkannt</span>
-        <div>
-          <span className="text-neutral-500">Ø </span>
-          <UnitValueDisplay kind="velocity" value={stats?.avgMps ?? null} />
-        </div>
-        <div>
-          <span className="text-neutral-500">SD </span>
-          <UnitValueDisplay kind="velocity" value={stats?.sdMps ?? null} />
-        </div>
-        <div>
-          <span className="text-neutral-500">ES </span>
-          <UnitValueDisplay kind="velocity" value={stats?.esMps ?? null} />
-        </div>
+      <div className="grid grid-cols-2 gap-4 rounded-xl border border-neutral-200/80 bg-white p-4 sm:grid-cols-4 dark:border-neutral-800 dark:bg-neutral-900">
+        <Stat label="Gültige Schuss">{shots.length}</Stat>
+        <Stat label="Ø">
+          <UnitValueDisplay kind="velocity" value={stats?.avgMps ?? null} fractionDigits={1} />
+        </Stat>
+        <Stat label="SD">
+          <UnitValueDisplay kind="velocity" value={stats?.sdMps ?? null} fractionDigits={1} />
+        </Stat>
+        <Stat label="ES">
+          <UnitValueDisplay kind="velocity" value={stats?.esMps ?? null} fractionDigits={1} />
+        </Stat>
       </div>
 
       <FormField label="Quelle / Gerät" htmlFor="sourceDevice">
@@ -254,10 +263,10 @@ export function ImportWizard({ groupId, sessionId }: ImportWizardProps) {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div className="flex gap-2">
-        <Button type="button" disabled={shots.length === 0 || isSaving} onClick={handleCommit}>
+        <Button type="button" icon="check" disabled={shots.length === 0 || isSaving} onClick={handleCommit}>
           {isSaving ? "Importieren…" : `${shots.length} Schuss importieren`}
         </Button>
-        <Button type="button" variant="secondary" onClick={reset}>
+        <Button type="button" variant="ghost" onClick={reset}>
           Andere Datei wählen
         </Button>
       </div>

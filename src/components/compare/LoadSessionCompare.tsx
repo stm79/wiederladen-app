@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
 import { TemperatureVelocityChart } from "@/components/charts/TemperatureVelocityChart";
+import { Card, EmptyState } from "@/components/ui/Layout";
+import { inputClass } from "@/components/forms/FormField";
 
 interface LoadSessionRow {
   sessionId: string;
@@ -21,7 +23,7 @@ interface LoadSessionCompareProps {
   sessionsByLoad: Record<string, LoadSessionRow[]>;
 }
 
-const DATE_FORMAT = new Intl.DateTimeFormat("de-DE");
+const DATE_FORMAT = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
 
 export function LoadSessionCompare({ loadOptions, sessionsByLoad }: LoadSessionCompareProps) {
   const [selectedLoadId, setSelectedLoadId] = useState(loadOptions[0]?.loadId ?? "");
@@ -37,7 +39,8 @@ export function LoadSessionCompare({ loadOptions, sessionsByLoad }: LoadSessionC
       <select
         value={selectedLoadId}
         onChange={(e) => setSelectedLoadId(e.target.value)}
-        className="w-full max-w-md rounded-md border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-800 dark:bg-neutral-900"
+        aria-label="Ladung wählen"
+        className={`${inputClass} sm:max-w-md`}
       >
         {loadOptions.map((l) => (
           <option key={l.loadId} value={l.loadId}>
@@ -47,15 +50,13 @@ export function LoadSessionCompare({ loadOptions, sessionsByLoad }: LoadSessionC
       </select>
 
       {sessions.length === 0 ? (
-        <p className="text-sm text-neutral-500">
-          Für diese Ladung sind noch keine Chrono-Daten aus Sessions erfasst.
-        </p>
+        <EmptyState icon="activity" title="Noch keine Chrono-Daten" description="Für diese Ladung sind noch keine Chrono-Daten aus Sessions erfasst." />
       ) : (
         <>
-          <div className="overflow-x-auto rounded-md border border-neutral-200 dark:border-neutral-800">
-            <table className="w-full min-w-[560px] text-sm">
+          <div className="overflow-x-auto rounded-xl border border-neutral-200/80 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+            <table className="w-full min-w-[560px] text-sm [&_td]:px-4 [&_td]:py-3 [&_td]:tabular-nums [&_th]:px-4 [&_th]:py-2.5 [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide">
               <thead>
-                <tr className="border-b border-neutral-200 bg-neutral-50 text-left dark:border-neutral-800 dark:bg-neutral-900">
+                <tr className="border-b border-neutral-200 bg-neutral-50/80 text-left text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400">
                   <th className="px-3 py-2 font-medium">Session</th>
                   <th className="px-3 py-2 font-medium">Temperatur</th>
                   <th className="px-3 py-2 font-medium">Ø Geschw.</th>
@@ -66,7 +67,7 @@ export function LoadSessionCompare({ loadOptions, sessionsByLoad }: LoadSessionC
               </thead>
               <tbody>
                 {sessions.map((s) => (
-                  <tr key={s.sessionId} className="border-b border-neutral-100 dark:border-neutral-900">
+                  <tr key={s.sessionId} className="border-b border-neutral-100 last:border-0 dark:border-neutral-800">
                     <td className="px-3 py-2">
                       {DATE_FORMAT.format(s.date)}
                       {s.location ? ` – ${s.location}` : ""}
@@ -91,7 +92,9 @@ export function LoadSessionCompare({ loadOptions, sessionsByLoad }: LoadSessionC
           </div>
 
           {withTemp.length > 0 ? (
-            <TemperatureVelocityChart
+            <Card>
+              <h3 className="mb-3 text-sm font-semibold">Temperatur vs. Ø Geschwindigkeit</h3>
+              <TemperatureVelocityChart
               points={withTemp.map((s) => ({
                 tempC: s.tempC!,
                 avgMps: s.avgMps!,
@@ -99,6 +102,7 @@ export function LoadSessionCompare({ loadOptions, sessionsByLoad }: LoadSessionC
                 location: s.location,
               }))}
             />
+            </Card>
           ) : (
             <p className="text-sm text-neutral-500">
               Keine der Sessions dieser Ladung hat eine Temperatur erfasst — Diagramm braucht das.

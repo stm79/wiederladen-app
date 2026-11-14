@@ -9,11 +9,13 @@ export function DeleteButton({
   confirmMessage,
   action,
   redirectTo,
+  label = "Löschen",
 }: {
   id: string;
   confirmMessage: string;
   action: (id: string) => Promise<unknown>;
   redirectTo: string;
+  label?: string;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -23,7 +25,8 @@ export function DeleteButton({
     <div className="flex flex-col gap-1">
       <Button
         type="button"
-        variant="danger"
+        variant="dangerGhost"
+        icon="trash"
         disabled={isPending}
         onClick={() => {
           if (!window.confirm(confirmMessage)) return;
@@ -39,7 +42,7 @@ export function DeleteButton({
           });
         }}
       >
-        {isPending ? "Löschen…" : "Löschen"}
+        {isPending ? "Löschen…" : label}
       </Button>
       {error && <span className="text-xs text-red-600">{error}</span>}
     </div>

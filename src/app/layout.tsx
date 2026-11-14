@@ -31,13 +31,13 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+      <body className="min-h-full bg-background text-neutral-900 dark:text-neutral-100">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <UnitProvider initialPrefs={unitPrefs}>
             <div className="flex min-h-screen flex-col md:flex-row">
               <NavBar />
-              <main className="flex-1 overflow-x-hidden px-4 pb-20 pt-4 md:px-8 md:pb-8 md:pt-6">
-                {children}
+              <main className="min-w-0 flex-1 px-4 pb-28 pt-5 md:px-10 md:pb-12 md:pt-8">
+                <div className="mx-auto w-full max-w-6xl">{children}</div>
               </main>
             </div>
           </UnitProvider>

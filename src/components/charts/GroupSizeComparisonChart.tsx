@@ -39,9 +39,7 @@ export function GroupSizeComparisonChart({ points }: { points: GroupSizePoint[] 
             stroke={CHART_AXIS}
             tickLine={false}
             interval={0}
-            angle={-20}
-            textAnchor="end"
-            height={60}
+            height={30}
           />
           <YAxis
             tick={{ fill: CHART_MUTED, fontSize: 12 }}

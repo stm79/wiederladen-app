@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteGroupImageAction } from "@/app/actions/images";
+import { Icon } from "@/components/ui/Icon";
 
 export function ImageDeleteButton({ id }: { id: string }) {
   const router = useRouter();
@@ -19,9 +20,11 @@ export function ImageDeleteButton({ id }: { id: string }) {
           router.refresh();
         });
       }}
-      className="rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white hover:bg-black/80 disabled:opacity-50"
+      aria-label="Bild löschen"
+      title="Bild löschen"
+      className="flex h-6 w-6 items-center justify-center rounded-md bg-black/60 text-white hover:bg-red-600 disabled:opacity-50"
     >
-      {isPending ? "…" : "✕"}
+      <Icon name="x" size={13} />
     </button>
   );
 }

@@ -4,13 +4,15 @@ import { prisma } from "@/lib/prisma";
 import { LoadForm } from "@/components/forms/LoadForm";
 import { DeleteButton } from "@/components/ui/DeleteButton";
 import { DuplicateButton } from "@/components/ui/DuplicateButton";
-import { Button } from "@/components/ui/Button";
+import { LinkButton } from "@/components/ui/Button";
+import { ListCard, ListRow, LoadNumberBadge, PageHeader, Section } from "@/components/ui/Layout";
 import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
 import { LoadChecklist } from "@/components/loads/LoadChecklist";
 import { deleteLoad } from "@/app/actions/loads";
 import { getDistinctLoadFieldValues } from "@/lib/loads/distinct-values";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
 import { loadDisplayName } from "@/lib/loads/label";
+import { formatDate } from "@/lib/format-date";
 
 export default async function LoadDetailPage({
   params,
@@ -22,6 +24,7 @@ export default async function LoadDetailPage({
     prisma.load.findUnique({
       where: { id },
       include: {
+        firearm: true,
         parentLoad: { include: { firearm: { select: { caliber: true } } } },
         variants: { orderBy: { createdAt: "desc" }, include: { firearm: { select: { caliber: true } } } },
         shotGroups: { include: { session: true }, orderBy: { createdAt: "desc" } },
@@ -35,100 +38,114 @@ export default async function LoadDetailPage({
 
   if (!load) notFound();
 
+  const { firearm, ...loadFields } = load;
+
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-6 sm:flex-row sm:justify-between">
-        <div className="max-w-2xl flex-1">
-          <h1 className="mb-1 text-xl font-semibold">Ladung bearbeiten</h1>
-          {load.parentLoad && (
-            <p className="mb-4 text-sm text-neutral-500">
-              Variante von{" "}
-              <Link href={`/loads/${load.parentLoad.id}`} className="underline">
-                {loadDisplayName({ ...load.parentLoad, caliber: load.parentLoad.firearm.caliber })}
-              </Link>
-            </p>
-          )}
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        stackActions
+        back={{ href: "/loads", label: "Ladedaten" }}
+        badge={<LoadNumberBadge large>{formatLoadNumber(load.loadNumber, load.variantLetter)}</LoadNumberBadge>}
+        title={loadDisplayName({ ...load, caliber: firearm.caliber })}
+        subtitle={
+          <>
+            <Link href={`/firearms/${firearm.id}`} className="hover:text-neutral-900 hover:underline dark:hover:text-white">
+              {firearm.name}
+            </Link>
+            {load.parentLoad && (
+              <>
+                {" · Variante von "}
+                <Link href={`/loads/${load.parentLoad.id}`} className="hover:text-neutral-900 hover:underline dark:hover:text-white">
+                  {formatLoadNumber(load.parentLoad.loadNumber, load.parentLoad.variantLetter)}
+                </Link>
+              </>
+            )}
+          </>
+        }
+        actions={
+          <>
+            <LinkButton href={`/loads/${load.id}/label`} variant="secondary" icon="tag">
+              Etikett
+            </LinkButton>
+            <LinkButton href={`/api/export/pdf/loads/${load.id}`} variant="secondary" icon="file" external>
+              PDF
+            </LinkButton>
+            <DuplicateButton id={load.id} />
+            <DeleteButton
+              id={load.id}
+              action={deleteLoad}
+              redirectTo="/loads"
+              confirmMessage="Diese Ladung wirklich löschen?"
+            />
+          </>
+        }
+      />
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr] lg:items-start">
+        <aside className="min-w-0 lg:col-start-2 lg:row-start-1">
+          <LoadChecklist
+            loadId={load.id}
+            steps={checklistSteps}
+            checkedStepIds={load.checklistChecks.map((c) => c.stepId)}
+          />
+        </aside>
+
+        <div className="min-w-0 lg:col-start-1 lg:row-span-2 lg:row-start-1">
           <LoadForm
             firearms={firearms}
-            load={load}
+            load={loadFields}
             knownPowders={known.powders}
             knownBullets={known.bullets}
             knownPrimers={known.primers}
           />
         </div>
-        <div className="flex shrink-0 flex-col gap-2">
-          <a href={`/api/export/pdf/loads/${load.id}`} className="text-center">
-            <Button type="button" variant="secondary" className="w-full">
-              PDF-Bericht
-            </Button>
-          </a>
-          <Link href={`/loads/${load.id}/label`} className="text-center">
-            <Button type="button" variant="secondary" className="w-full">
-              Dymo-Label
-            </Button>
-          </Link>
-          <DuplicateButton id={load.id} />
-          <DeleteButton
-            id={load.id}
-            action={deleteLoad}
-            redirectTo="/loads"
-            confirmMessage="Diese Ladung wirklich löschen?"
-          />
-        </div>
+
+        <aside className="flex min-w-0 flex-col gap-6 lg:col-start-2 lg:row-start-2">
+          <Section title="Schussgruppen">
+            {load.shotGroups.length === 0 ? (
+              <p className="text-sm text-neutral-500">Noch nicht geschossen.</p>
+            ) : (
+              <ListCard>
+                {load.shotGroups.map((group) => (
+                  <ListRow key={group.id} href={`/sessions/${group.sessionId}`}>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium tabular-nums">{formatDate(group.session.date)}</div>
+                      <div className="truncate text-sm text-neutral-500 dark:text-neutral-400">
+                        {[
+                          group.distanceM ? `${group.distanceM} m` : null,
+                          group.shotCount ? `${group.shotCount} Schuss` : null,
+                          group.session.location,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </div>
+                    </div>
+                    <span className="shrink-0 text-sm font-medium tabular-nums">
+                      <UnitValueDisplay kind="length" value={group.extremeSpreadMm} fractionDigits={1} />
+                    </span>
+                  </ListRow>
+                ))}
+              </ListCard>
+            )}
+          </Section>
+
+          {load.variants.length > 0 && (
+            <Section title="Varianten">
+              <ListCard>
+                {load.variants.map((variant) => (
+                  <ListRow key={variant.id} href={`/loads/${variant.id}`}>
+                    <LoadNumberBadge>{formatLoadNumber(variant.loadNumber, variant.variantLetter)}</LoadNumberBadge>
+                    <span className="min-w-0 flex-1 truncate text-sm">
+                      <UnitValueDisplay kind="weight" value={variant.chargeGrains} />
+                      {variant.powder ? <span className="text-neutral-500"> · {variant.powder}</span> : null}
+                    </span>
+                  </ListRow>
+                ))}
+              </ListCard>
+            </Section>
+          )}
+        </aside>
       </div>
-
-      <LoadChecklist
-        loadId={load.id}
-        steps={checklistSteps}
-        checkedStepIds={load.checklistChecks.map((c) => c.stepId)}
-      />
-
-      {load.shotGroups.length > 0 && (
-        <div>
-          <h2 className="mb-3 text-lg font-semibold">Schussgruppen mit dieser Ladung</h2>
-          <div className="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-800">
-            {load.shotGroups.map((group) => (
-              <Link
-                key={group.id}
-                href={`/sessions/${group.sessionId}`}
-                className="flex items-center justify-between py-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-              >
-                <div>
-                  <div className="font-medium">
-                    {new Intl.DateTimeFormat("de-DE").format(group.session.date)}
-                    {group.session.location ? ` – ${group.session.location}` : ""}
-                  </div>
-                  <div className="text-sm text-neutral-500">
-                    {group.distanceM ? `${group.distanceM} m · ` : ""}
-                    {group.shotCount ? `${group.shotCount} Schuss` : ""}
-                  </div>
-                </div>
-                <UnitValueDisplay kind="length" value={group.extremeSpreadMm} />
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {load.variants.length > 0 && (
-        <div>
-          <h2 className="mb-3 text-lg font-semibold">Varianten dieser Ladung</h2>
-          <div className="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-800">
-            {load.variants.map((variant) => (
-              <Link
-                key={variant.id}
-                href={`/loads/${variant.id}`}
-                className="py-2 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-              >
-                <span className="mr-2 text-neutral-400 tabular-nums">
-                  {formatLoadNumber(variant.loadNumber, variant.variantLetter)}
-                </span>
-                {loadDisplayName({ ...variant, caliber: variant.firearm.caliber })}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

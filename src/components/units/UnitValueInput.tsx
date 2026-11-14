@@ -11,6 +11,7 @@ import {
   type AnyUnit,
 } from "@/lib/units/format";
 import { UNIT_LABELS } from "@/lib/units/types";
+import { inputClass } from "@/components/forms/FormField";
 
 interface UnitValueInputProps {
   kind: UnitKind;
@@ -81,7 +82,7 @@ export function UnitValueInput({
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5">
       <input
         id={id}
         type="number"
@@ -102,12 +103,9 @@ export function UnitValueInput({
             onChange(toCanonicalValueForUnit(kind, num, unit));
           }
         }}
-        className={
-          className ??
-          "w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        }
+        className={className ?? `${inputClass} min-w-0 tabular-nums`}
       />
-      <div className="flex shrink-0 overflow-hidden rounded-md border border-neutral-300 text-xs dark:border-neutral-700">
+      <div className="flex h-10 shrink-0 items-center gap-0.5 rounded-lg bg-neutral-100 p-1 text-xs dark:bg-neutral-800">
         {KIND_UNIT_PAIR[kind].map((u) => (
           <button
             key={u}
@@ -116,8 +114,8 @@ export function UnitValueInput({
             title={`Für dieses Feld auf ${UNIT_LABELS[u]} umschalten`}
             className={
               u === unit
-                ? "bg-neutral-900 px-1.5 py-1.5 font-medium text-white dark:bg-neutral-100 dark:text-neutral-900"
-                : "px-1.5 py-1.5 text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
+                ? "h-full min-w-8 rounded-md bg-white px-2 font-semibold text-neutral-900 shadow-xs dark:bg-neutral-950 dark:text-white"
+                : "h-full min-w-8 rounded-md px-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
             }
           >
             {UNIT_LABELS[u]}

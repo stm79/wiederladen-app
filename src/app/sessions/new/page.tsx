@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/ui/Layout";
 import { prisma } from "@/lib/prisma";
 import { SessionForm } from "@/components/forms/SessionForm";
 
@@ -16,8 +17,12 @@ export default async function NewSessionPage() {
   const loads = loadsRaw.map((load) => ({ ...load, caliber: load.firearm.caliber }));
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Neue Session</h1>
+    <div className="flex max-w-3xl flex-col gap-6">
+      <PageHeader
+        back={{ href: "/sessions", label: "Sessions" }}
+        title="Neue Session"
+        subtitle="Schussgruppen und Chrono-Daten fügst du nach dem Anlegen hinzu."
+      />
       <SessionForm firearms={firearms} loads={loads} />
     </div>
   );

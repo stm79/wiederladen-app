@@ -3,6 +3,7 @@ import { buildComparisonRow } from "@/lib/comparison/aggregate";
 import { buildLoadSessionBreakdown } from "@/lib/comparison/session-breakdown";
 import { CompareView } from "@/components/compare/CompareView";
 import { LoadSessionCompare } from "@/components/compare/LoadSessionCompare";
+import { EmptyState, PageHeader, Section } from "@/components/ui/Layout";
 
 // Aggregates data from loads, velocity sets, and shot groups — none of those
 // mutations revalidate this route, so always render fresh.
@@ -65,27 +66,22 @@ export default async function ComparePage() {
 
   return (
     <div className="flex flex-col gap-10">
-      <h1 className="text-xl font-semibold">Vergleich</h1>
+      <PageHeader title="Vergleich" subtitle="Ladungen nebeneinander auswerten — Geschwindigkeit, Streuung, Gruppengröße." />
 
-      <div className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Ladungen vergleichen</h2>
+      <Section title="Ladungen vergleichen">
         {rows.length === 0 ? (
-          <p className="text-sm text-neutral-500">Noch keine Ladedaten zum Vergleichen vorhanden.</p>
+          <EmptyState icon="chart" title="Noch keine Ladedaten zum Vergleichen vorhanden" />
         ) : (
           <CompareView rows={rows} />
         )}
-      </div>
+      </Section>
 
-      <div className="flex flex-col gap-4 border-t border-neutral-200 pt-8 dark:border-neutral-800">
-        <div>
-          <h2 className="text-lg font-semibold">Eine Ladung über mehrere Sessions</h2>
-          <p className="text-sm text-neutral-500">
-            Zeigt dieselbe Ladung Session für Session — z.B. um zu sehen, wie stark unterschiedliche
-            Temperaturen die Geschwindigkeit verändert haben.
-          </p>
-        </div>
+      <Section
+        title="Eine Ladung über mehrere Sessions"
+        description="Dieselbe Ladung Session für Session — z.B. um zu sehen, wie stark unterschiedliche Temperaturen die Geschwindigkeit verändert haben."
+      >
         <LoadSessionCompare loadOptions={rows.map((r) => ({ loadId: r.loadId, loadLabel: r.loadLabel }))} sessionsByLoad={sessionsByLoad} />
-      </div>
+      </Section>
     </div>
   );
 }

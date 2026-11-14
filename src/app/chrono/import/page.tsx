@@ -1,4 +1,6 @@
-import Link from "next/link";
+import { PageHeader } from "@/components/ui/Layout";
+import { formatLoadNumber } from "@/lib/loads/variant-letter";
+import { formatDate } from "@/lib/format-date";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ImportWizard } from "@/components/chrono/ImportWizard";
@@ -22,18 +24,20 @@ export default async function ChronoImportPage({
   if (!group) notFound();
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">
-          Chrono-Daten importieren
-          <span className="ml-2 text-sm font-normal text-neutral-500">
-            {group.load ? loadDisplayName({ ...group.load, caliber: group.load.firearm.caliber }) : "Ohne Ladung"}
-          </span>
-        </h1>
-        <Link href={`/sessions/${group.sessionId}`} className="text-sm text-neutral-500 underline">
-          Zurück zur Session
-        </Link>
-      </div>
+    <div className="flex max-w-4xl flex-col gap-6">
+      <PageHeader
+        back={{ href: `/sessions/${group.sessionId}`, label: "Zurück zur Session" }}
+        title="Chrono-Daten importieren"
+        subtitle={
+          <>
+            {group.load
+              ? `${formatLoadNumber(group.load.loadNumber, group.load.variantLetter)} ${loadDisplayName({ ...group.load, caliber: group.load.firearm.caliber })}`
+              : "Ohne Ladung"}
+            {" · "}
+            {formatDate(group.session.date)}
+          </>
+        }
+      />
       <ImportWizard groupId={group.id} sessionId={group.sessionId} />
     </div>
   );
