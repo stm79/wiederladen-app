@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { LoadForm } from "@/components/forms/LoadForm";
 import { DeleteButton } from "@/components/ui/DeleteButton";
-import { DuplicateButton } from "@/components/ui/DuplicateButton";
+import { CloneLoadButton } from "@/components/loads/CloneLoadButton";
 import { LinkButton } from "@/components/ui/Button";
 import { ListCard, ListRow, LoadNumberBadge, PageHeader, Section } from "@/components/ui/Layout";
 import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
@@ -70,7 +70,7 @@ export default async function LoadDetailPage({
             <LinkButton href={`/api/export/pdf/loads/${load.id}`} variant="secondary" icon="file" external>
               PDF
             </LinkButton>
-            <DuplicateButton id={load.id} />
+            <CloneLoadButton id={load.id} />
             <DeleteButton
               id={load.id}
               action={deleteLoad}

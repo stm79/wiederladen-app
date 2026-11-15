@@ -60,23 +60,35 @@ export async function deleteLoad(id: string) {
   revalidatePath("/loads");
 }
 
-export async function duplicateLoad(id: string): Promise<LoadActionResult> {
+export type CloneMode = "variant" | "new";
+
+/** Copy a load with all its recipe values, either as the next variant of the
+ *  same load (same number, next letter) or as a brand-new load (next free
+ *  number, no letter). Both stay editable afterward. */
+export async function cloneLoad(id: string, mode: CloneMode): Promise<LoadActionResult> {
   const source = await prisma.load.findUniqueOrThrow({ where: { id } });
 
-  // Duplicates stay in the same "load family" (same base loadNumber) and get
-  // the next sequential variant letter (A = the original, B/C/... = each
-  // duplicate), regardless of how deep the duplicate-of-a-duplicate chain is.
-  // Both remain editable afterward if this guess doesn't match the user's
-  // own numbering.
-  const siblingCount = await prisma.load.count({ where: { loadNumber: source.loadNumber } });
-  // An unlettered source doesn't occupy an "A" slot, so the first copy of one
-  // starts at "A" instead of "B".
-  const variantLetter = indexToVariantLetter(source.variantLetter ? siblingCount : siblingCount - 1);
+  let loadNumber: number;
+  let variantLetter: string;
+  if (mode === "variant") {
+    // Variants stay in the same "load family" (same base loadNumber) and get
+    // the next sequential variant letter (A = the original, B/C/... = each
+    // copy), regardless of how deep the copy-of-a-copy chain is.
+    const siblingCount = await prisma.load.count({ where: { loadNumber: source.loadNumber } });
+    loadNumber = source.loadNumber;
+    // An unlettered source doesn't occupy an "A" slot, so the first copy of one
+    // starts at "A" instead of "B".
+    variantLetter = indexToVariantLetter(source.variantLetter ? siblingCount : siblingCount - 1);
+  } else {
+    const max = await prisma.load.aggregate({ _max: { loadNumber: true } });
+    loadNumber = (max._max.loadNumber ?? 0) + 1;
+    variantLetter = "";
+  }
 
   try {
     const copy = await prisma.load.create({
       data: {
-        loadNumber: source.loadNumber,
+        loadNumber,
         variantLetter,
         name: source.name ? `${source.name} (Kopie)` : null,
         firearmId: source.firearmId,
@@ -96,7 +108,7 @@ export async function duplicateLoad(id: string): Promise<LoadActionResult> {
         cbtoMm: source.cbtoMm,
         crimpInfo: source.crimpInfo,
         notes: source.notes,
-        parentLoadId: source.id,
+        parentLoadId: mode === "variant" ? source.id : null,
       },
     });
     revalidatePath("/loads");
