@@ -4,6 +4,7 @@ import { fmt, fmtDateTime } from "./format";
 import { pdfStyles as s } from "./styles";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
 import { loadDisplayName } from "@/lib/loads/label";
+import { formatDate } from "@/lib/format-date";
 
 export interface LoadReportData {
   loadNumber: number;
@@ -11,6 +12,7 @@ export interface LoadReportData {
   name: string | null;
   firearmName: string;
   caliber: string;
+  createdAt: Date;
   primer: string | null;
   powder: string | null;
   chargeGrains: number;
@@ -54,18 +56,21 @@ export function LoadReportDocument({ load, prefs }: { load: LoadReportData; pref
           {formatLoadNumber(load.loadNumber, load.variantLetter)} · {load.firearmName} ({load.caliber})
         </Text>
 
-        <Text style={s.sectionTitle}>Rezept</Text>
-        <Row label="Zündhütchen" value={load.primer ?? "—"} />
+        <Text style={s.sectionTitle}>Übersicht</Text>
+        <Row label="Ladungsnummer" value={formatLoadNumber(load.loadNumber, load.variantLetter)} />
+        <Row label="Waffe" value={load.firearmName} />
+        <Row label="Kaliber" value={load.caliber} />
+        <Row label="Erstellt am" value={formatDate(load.createdAt)} />
+
+        <Text style={s.sectionTitle}>Komponenten</Text>
         <Row label="Pulver" value={load.powder ?? "—"} />
         <Row label="Ladungsmenge" value={fmt("weight", load.chargeGrains, prefs)} />
         <Row label="Geschoss" value={load.bullet ?? "—"} />
         <Row label="Geschossgewicht" value={fmt("weight", load.bulletWeightGr, prefs)} />
-        <Row label="OAL" value={fmt("length", load.oalMm, prefs)} />
-        <Row label="CBTO" value={fmt("length", load.cbtoMm, prefs)} />
-        <Row label="Crimp" value={load.crimpInfo ?? "—"} />
+        <Row label="Zündhütchen" value={load.primer ?? "—"} />
 
-        <Text style={s.sectionTitle}>Hülsenvorbereitung</Text>
-        <Row label="Hülse" value={load.caseBrand ?? "—"} />
+        <Text style={s.sectionTitle}>Hülse</Text>
+        <Row label="Hülsen-Marke" value={load.caseBrand ?? "—"} />
         <Row label="Anzahl (Stück)" value={load.caseQuantity != null ? String(load.caseQuantity) : "—"} />
         <Row label="Load Count" value={load.caseLoadCount != null ? String(load.caseLoadCount) : "—"} />
         <Row label="Trimmlänge" value={fmt("length", load.caseTrimLengthMm, prefs)} />
@@ -73,6 +78,9 @@ export function LoadReportDocument({ load, prefs }: { load: LoadReportData; pref
         <Row label="Shoulder Bump" value={fmt("length", load.shoulderBumpMm, prefs)} />
         <Row label="Bushing" value={fmt("length", load.bushingDiameterMm, prefs)} />
         <Row label="Expander Mandrel" value={fmt("length", load.mandrelDiameterMm, prefs)} />
+        <Row label="OAL" value={fmt("length", load.oalMm, prefs)} />
+        <Row label="CBTO" value={fmt("length", load.cbtoMm, prefs)} />
+        <Row label="Crimp" value={load.crimpInfo ?? "—"} />
 
         <Text style={s.sectionTitle}>Auswertung ({load.shotCount} Schuss, {load.groupCount} Gruppen)</Text>
         <Row label="Ø Geschwindigkeit" value={fmt("velocity", load.avgMps, prefs, 1)} />
@@ -87,7 +95,7 @@ export function LoadReportDocument({ load, prefs }: { load: LoadReportData; pref
           </>
         )}
 
-        <Text style={s.footer}>Erstellt am {fmtDateTime(new Date())} · Wiederladen</Text>
+        <Text style={s.footer}>Exportiert am {fmtDateTime(new Date())} · Wiederladen</Text>
       </Page>
     </Document>
   );

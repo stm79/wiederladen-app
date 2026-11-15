@@ -48,6 +48,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         name: load.name,
         firearmName: load.firearm.name,
         caliber: load.firearm.caliber,
+        createdAt: load.createdAt,
         primer: load.primer,
         powder: load.powder,
         chargeGrains: load.chargeGrains,
