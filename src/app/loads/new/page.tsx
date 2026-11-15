@@ -49,6 +49,8 @@ export default async function NewLoadPage({
         knownPowders={known.powders}
         knownBullets={known.bullets}
         knownPrimers={known.primers}
+        knownSizingDies={known.sizingDies}
+        knownSeatingDies={known.seatingDies}
       />
     </div>
   );

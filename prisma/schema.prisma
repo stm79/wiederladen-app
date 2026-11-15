@@ -46,6 +46,7 @@ model Load {
   shoulderBumpMm Float?
   bushingDiameterMm Float?
   mandrelDiameterMm Float?
+  seatingDie     String?
   primer         String?
   powder         String?
   chargeGrains   Float

@@ -21,7 +21,7 @@ const TABS = [
     label: "Hülse",
     fields: [
       "caseBrand", "caseQuantity", "caseLoadCount", "caseTrimLengthMm", "sizingDie", "shoulderBumpMm",
-      "bushingDiameterMm", "mandrelDiameterMm", "oalMm", "cbtoMm", "crimpInfo",
+      "bushingDiameterMm", "mandrelDiameterMm", "seatingDie", "oalMm", "cbtoMm", "crimpInfo",
     ],
   },
 ] as const satisfies readonly { id: string; label: string; fields: readonly (keyof LoadInput)[] }[];
@@ -39,6 +39,8 @@ interface LoadFormProps {
   knownPowders: string[];
   knownBullets: string[];
   knownPrimers: string[];
+  knownSizingDies: string[];
+  knownSeatingDies: string[];
   load?: {
     id: string;
     loadNumber: number;
@@ -54,6 +56,7 @@ interface LoadFormProps {
     shoulderBumpMm: number | null;
     bushingDiameterMm: number | null;
     mandrelDiameterMm: number | null;
+    seatingDie: string | null;
     primer: string | null;
     powder: string | null;
     chargeGrains: number;
@@ -76,6 +79,8 @@ export function LoadForm({
   knownPowders,
   knownBullets,
   knownPrimers,
+  knownSizingDies,
+  knownSeatingDies,
   load,
   defaultFirearmId,
   prefill,
@@ -107,6 +112,7 @@ export function LoadForm({
           shoulderBumpMm: null,
           bushingDiameterMm: null,
           mandrelDiameterMm: null,
+          seatingDie: "",
           primer: "",
           powder: "",
           chargeGrains: 0,
@@ -327,7 +333,12 @@ export function LoadForm({
             {lengthInput("caseTrimLengthMm")}
           </FormField>
           <FormField label="Matrize (Kalibrierung)" htmlFor="sizingDie">
-            <input id="sizingDie" className={inputClass} placeholder="z.B. Redding S-Type FL" {...register("sizingDie")} />
+            <ComboboxInput
+              id="sizingDie"
+              options={knownSizingDies}
+              placeholder="z.B. Redding S-Type FL"
+              {...register("sizingDie")}
+            />
           </FormField>
           <FormField label="Shoulder Bump" htmlFor="shoulderBumpMm">
             {lengthInput("shoulderBumpMm")}
@@ -337,6 +348,14 @@ export function LoadForm({
           </FormField>
           <FormField label="Expander Mandrel (Durchmesser)" htmlFor="mandrelDiameterMm">
             {lengthInput("mandrelDiameterMm")}
+          </FormField>
+          <FormField label="Setzmatrize" htmlFor="seatingDie" className="@md:col-span-2">
+            <ComboboxInput
+              id="seatingDie"
+              options={knownSeatingDies}
+              placeholder="z.B. Redding Competition Seater"
+              {...register("seatingDie")}
+            />
           </FormField>
           <FormField label="OAL (Gesamtlänge)" htmlFor="oalMm">
             {lengthInput("oalMm")}

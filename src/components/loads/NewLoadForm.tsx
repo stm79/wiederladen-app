@@ -14,6 +14,8 @@ interface NewLoadFormProps {
   knownPowders: string[];
   knownBullets: string[];
   knownPrimers: string[];
+  knownSizingDies: string[];
+  knownSeatingDies: string[];
 }
 
 interface Imported {

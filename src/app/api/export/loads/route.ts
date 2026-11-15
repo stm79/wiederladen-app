@@ -29,6 +29,7 @@ export async function GET() {
     shoulderBumpMm: l.shoulderBumpMm ?? "",
     bushingDurchmesserMm: l.bushingDiameterMm ?? "",
     mandrelDurchmesserMm: l.mandrelDiameterMm ?? "",
+    setzmatrize: l.seatingDie ?? "",
     crimp: l.crimpInfo ?? "",
     notizen: l.notes ?? "",
     angelegtAm: l.createdAt.toISOString(),

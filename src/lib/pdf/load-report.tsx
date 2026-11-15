@@ -25,6 +25,7 @@ export interface LoadReportData {
   caseLoadCount: number | null;
   caseTrimLengthMm: number | null;
   sizingDie: string | null;
+  seatingDie: string | null;
   shoulderBumpMm: number | null;
   bushingDiameterMm: number | null;
   mandrelDiameterMm: number | null;
@@ -74,10 +75,11 @@ export function LoadReportDocument({ load, prefs }: { load: LoadReportData; pref
         <Row label="Anzahl (Stück)" value={load.caseQuantity != null ? String(load.caseQuantity) : "—"} />
         <Row label="Load Count" value={load.caseLoadCount != null ? String(load.caseLoadCount) : "—"} />
         <Row label="Trimmlänge" value={fmt("length", load.caseTrimLengthMm, prefs)} />
-        <Row label="Matrize" value={load.sizingDie ?? "—"} />
+        <Row label="Matrize (Kalibrierung)" value={load.sizingDie ?? "—"} />
         <Row label="Shoulder Bump" value={fmt("length", load.shoulderBumpMm, prefs)} />
         <Row label="Bushing" value={fmt("length", load.bushingDiameterMm, prefs)} />
         <Row label="Expander Mandrel" value={fmt("length", load.mandrelDiameterMm, prefs)} />
+        <Row label="Setzmatrize" value={load.seatingDie ?? "—"} />
         <Row label="OAL" value={fmt("length", load.oalMm, prefs)} />
         <Row label="CBTO" value={fmt("length", load.cbtoMm, prefs)} />
         <Row label="Crimp" value={load.crimpInfo ?? "—"} />

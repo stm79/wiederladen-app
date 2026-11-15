@@ -61,6 +61,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         caseLoadCount: load.caseLoadCount,
         caseTrimLengthMm: load.caseTrimLengthMm,
         sizingDie: load.sizingDie,
+        seatingDie: load.seatingDie,
         shoulderBumpMm: load.shoulderBumpMm,
         bushingDiameterMm: load.bushingDiameterMm,
         mandrelDiameterMm: load.mandrelDiameterMm,

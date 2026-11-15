@@ -86,6 +86,7 @@ export async function duplicateLoad(id: string): Promise<LoadActionResult> {
         shoulderBumpMm: source.shoulderBumpMm,
         bushingDiameterMm: source.bushingDiameterMm,
         mandrelDiameterMm: source.mandrelDiameterMm,
+        seatingDie: source.seatingDie,
         primer: source.primer,
         powder: source.powder,
         chargeGrains: source.chargeGrains,

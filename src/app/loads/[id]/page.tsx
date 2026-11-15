@@ -97,6 +97,8 @@ export default async function LoadDetailPage({
             knownPowders={known.powders}
             knownBullets={known.bullets}
             knownPrimers={known.primers}
+            knownSizingDies={known.sizingDies}
+            knownSeatingDies={known.seatingDies}
           />
         </div>
 

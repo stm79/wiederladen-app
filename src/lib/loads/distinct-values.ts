@@ -3,10 +3,10 @@ import { POWDER_CATALOG } from "@/lib/loads/powder-catalog";
 import { BULLET_CATALOG } from "@/lib/loads/bullet-catalog";
 
 /** Distinct, previously-used values for the combobox-with-history fields on
- *  the load form (powder, bullet, primer) — lets the user pick a value
+ *  the load form (powder, bullet, primer, dies) — lets the user pick a value
  *  they've used before or type a new one. */
 export async function getDistinctLoadFieldValues() {
-  const [powders, bullets, primers] = await Promise.all([
+  const [powders, bullets, primers, sizingDies, seatingDies] = await Promise.all([
     prisma.load.findMany({
       where: { powder: { not: null } },
       distinct: ["powder"],
@@ -25,6 +25,18 @@ export async function getDistinctLoadFieldValues() {
       select: { primer: true },
       orderBy: { primer: "asc" },
     }),
+    prisma.load.findMany({
+      where: { sizingDie: { not: null } },
+      distinct: ["sizingDie"],
+      select: { sizingDie: true },
+      orderBy: { sizingDie: "asc" },
+    }),
+    prisma.load.findMany({
+      where: { seatingDie: { not: null } },
+      distinct: ["seatingDie"],
+      select: { seatingDie: true },
+      orderBy: { seatingDie: "asc" },
+    }),
   ]);
 
   const usedPowders = powders.map((p) => p.powder!);
@@ -37,5 +49,7 @@ export async function getDistinctLoadFieldValues() {
     powders: allPowders,
     bullets: allBullets,
     primers: primers.map((p) => p.primer!),
+    sizingDies: sizingDies.map((d) => d.sizingDie!),
+    seatingDies: seatingDies.map((d) => d.seatingDie!),
   };
 }
