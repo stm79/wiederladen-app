@@ -38,6 +38,8 @@ model Load {
   name           String?
   firearmId      String
   firearm        Firearm       @relation(fields: [firearmId], references: [id], onDelete: Cascade)
+  caseLotId      String?
+  caseLot        CaseLot?      @relation(fields: [caseLotId], references: [id], onDelete: SetNull)
   caseBrand      String?
   caseQuantity   Int?
   caseLoadCount  Int?
@@ -68,6 +70,25 @@ model Load {
   @@unique([loadNumber, variantLetter])
   @@index([firearmId])
   @@index([parentLoadId])
+  @@index([caseLotId])
+}
+
+// A physical batch of cases (e.g. "100 Lapua .308 bought 03/2025") that is
+// reloaded over and over: every load that used these cases points here, so
+// the lot's history (load 5 -> 17 -> 30) is just its loads in date order.
+model CaseLot {
+  id          String    @id @default(cuid())
+  number      Int       @unique // shown as "L-01"
+  name        String
+  brand       String?
+  caliber     String?
+  quantity    Int?
+  purchasedAt DateTime?
+  retired     Boolean   @default(false)
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  loads       Load[]
 }
 
 model ChecklistStep {

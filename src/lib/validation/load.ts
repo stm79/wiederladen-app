@@ -10,6 +10,7 @@ export const loadSchema = z.object({
   name: z.string().nullable().optional(),
   createdAt: z.string().min(1, "Datum ist erforderlich"), // ISO date string (yyyy-mm-dd) from <input type="date">
   firearmId: z.string().min(1, "Waffe ist erforderlich"),
+  caseLotId: z.string().nullable().optional(),
   caseBrand: z.string().nullable().optional(),
   caseQuantity: z.number().int().positive().nullable().optional(),
   caseLoadCount: z.number().int().positive().nullable().optional(),
@@ -35,6 +36,7 @@ export type LoadInput = z.infer<typeof loadSchema>;
 
 export const LOAD_OPTIONAL_TEXT_FIELDS = [
   "name",
+  "caseLotId",
   "caseBrand",
   "sizingDie",
   "seatingDie",

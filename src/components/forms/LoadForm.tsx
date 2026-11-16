@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Controller, useForm, type FieldErrors } from "react-hook-form";
+import { Controller, useForm, useWatch, type FieldErrors } from "react-hook-form";
 import { clsx } from "clsx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loadSchema, type LoadInput } from "@/lib/validation/load";
@@ -12,6 +12,9 @@ import { ComboboxInput } from "@/components/forms/ComboboxInput";
 import { UnitValueInput } from "@/components/units/UnitValueInput";
 import { Button } from "@/components/ui/Button";
 import { toDateInputValue } from "@/lib/date-input";
+import { CaseLotPicker } from "@/components/case-lots/CaseLotPicker";
+import { suggestCaseLoadCount } from "@/lib/case-lots/history";
+import type { CaseLotOption } from "@/lib/case-lots/options";
 
 const TABS = [
   { id: "overview", label: "Übersicht", fields: ["loadNumber", "variantLetter", "createdAt", "firearmId", "name"] },
@@ -20,7 +23,7 @@ const TABS = [
     id: "case",
     label: "Hülse",
     fields: [
-      "caseBrand", "caseQuantity", "caseLoadCount", "caseTrimLengthMm", "sizingDie", "shoulderBumpMm",
+      "caseLotId", "caseBrand", "caseQuantity", "caseLoadCount", "caseTrimLengthMm", "sizingDie", "shoulderBumpMm",
       "bushingDiameterMm", "mandrelDiameterMm", "seatingDie", "oalMm", "cbtoMm", "crimpInfo",
     ],
   },
@@ -41,6 +44,7 @@ interface LoadFormProps {
   knownPrimers: string[];
   knownSizingDies: string[];
   knownSeatingDies: string[];
+  caseLots: CaseLotOption[];
   load?: {
     id: string;
     loadNumber: number;
@@ -48,6 +52,7 @@ interface LoadFormProps {
     name: string | null;
     createdAt: Date;
     firearmId: string;
+    caseLotId: string | null;
     caseBrand: string | null;
     caseQuantity: number | null;
     caseLoadCount: number | null;
@@ -81,6 +86,7 @@ export function LoadForm({
   knownPrimers,
   knownSizingDies,
   knownSeatingDies,
+  caseLots,
   load,
   defaultFirearmId,
   prefill,
@@ -93,6 +99,8 @@ export function LoadForm({
     register,
     handleSubmit,
     control,
+    getValues,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoadInput>({
     resolver: zodResolver(loadSchema),
@@ -104,6 +112,7 @@ export function LoadForm({
           name: "",
           createdAt: toDateInputValue(new Date()),
           firearmId: defaultFirearmId ?? firearms[0]?.id ?? "",
+          caseLotId: null,
           caseBrand: "",
           caseQuantity: null,
           caseLoadCount: null,
@@ -150,6 +159,32 @@ export function LoadForm({
     }
   }
   const errorTabs = tabsWithErrors(errors);
+
+  const [watchedFirearmId, watchedLoadNumber, watchedVariant, watchedLoadCount, watchedCreatedAt] = useWatch({
+    control,
+    name: ["firearmId", "loadNumber", "variantLetter", "caseLoadCount", "createdAt"],
+  });
+  const firearmCaliber = firearms.find((f) => f.id === watchedFirearmId)?.caliber;
+
+  // Values the lot picker filled in last. Picking another lot may overwrite
+  // them, but never something the user typed in themselves.
+  const autoFilled = useRef<{ caseLoadCount?: number | null; caseBrand?: string | null; caseQuantity?: number | null }>({});
+
+  function onCaseLotChange(lot: CaseLotOption | null) {
+    setValue("caseLotId", lot?.id ?? null, { shouldDirty: true });
+    if (!lot) return;
+    type Fillable = "caseLoadCount" | "caseBrand" | "caseQuantity";
+    const fill = (name: Fillable, value: string | number | null) => {
+      if (value == null || value === "") return;
+      const current = getValues(name);
+      if (current != null && current !== "" && current !== autoFilled.current[name]) return;
+      setValue(name, value as never, { shouldDirty: true });
+      autoFilled.current[name] = value as never;
+    };
+    fill("caseLoadCount", suggestCaseLoadCount(lot.loads.filter((l) => l.id !== load?.id), getValues("loadNumber")));
+    fill("caseBrand", lot.brand);
+    fill("caseQuantity", lot.quantity);
+  }
 
   const numberInput = (name: "caseQuantity" | "caseLoadCount", id: string) => (
     <Controller
@@ -320,6 +355,25 @@ export function LoadForm({
 
       <div role="tabpanel" id="panel-case" aria-labelledby="tab-case" hidden={activeTab !== "case"}>
         <FormSection title="Hülse">
+          <Controller
+            control={control}
+            name="caseLotId"
+            render={({ field }) => (
+              <CaseLotPicker
+                lots={caseLots}
+                value={field.value}
+                onChange={onCaseLotChange}
+                caliber={firearmCaliber}
+                current={{
+                  id: load?.id,
+                  loadNumber: Number(watchedLoadNumber) || 0,
+                  variantLetter: watchedVariant ?? "",
+                  caseLoadCount: watchedLoadCount ?? null,
+                  createdAt: watchedCreatedAt,
+                }}
+              />
+            )}
+          />
           <FormField label="Hülsen-Marke" htmlFor="caseBrand">
             <input id="caseBrand" className={inputClass} placeholder="z.B. Lapua" {...register("caseBrand")} />
           </FormField>

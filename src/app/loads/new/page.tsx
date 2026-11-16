@@ -3,6 +3,7 @@ import { EmptyState, PageHeader } from "@/components/ui/Layout";
 import { prisma } from "@/lib/prisma";
 import { NewLoadForm } from "@/components/loads/NewLoadForm";
 import { getDistinctLoadFieldValues } from "@/lib/loads/distinct-values";
+import { getCaseLotOptions } from "@/lib/case-lots/options";
 
 // Depends on the current firearms/loads lists and suggested next load
 // number, which aren't revalidated from this route — always render fresh.
@@ -14,10 +15,11 @@ export default async function NewLoadPage({
   searchParams: Promise<{ firearmId?: string }>;
 }) {
   const { firearmId } = await searchParams;
-  const [firearms, known, maxLoadNumber] = await Promise.all([
+  const [firearms, known, maxLoadNumber, caseLots] = await Promise.all([
     prisma.firearm.findMany({ orderBy: { name: "asc" } }),
     getDistinctLoadFieldValues(),
     prisma.load.aggregate({ _max: { loadNumber: true } }),
+    getCaseLotOptions(),
   ]);
   const suggestedLoadNumber = (maxLoadNumber._max.loadNumber ?? 0) + 1;
 
@@ -51,6 +53,7 @@ export default async function NewLoadPage({
         knownPrimers={known.primers}
         knownSizingDies={known.sizingDies}
         knownSeatingDies={known.seatingDies}
+        caseLots={caseLots}
       />
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { LoadForm } from "@/components/forms/LoadForm";
+import type { CaseLotOption } from "@/lib/case-lots/options";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { grtLoadData, parseGrtFile, type GrtLoadData } from "@/lib/grt/parse";
@@ -16,6 +17,7 @@ interface NewLoadFormProps {
   knownPrimers: string[];
   knownSizingDies: string[];
   knownSeatingDies: string[];
+  caseLots: CaseLotOption[];
 }
 
 interface Imported {

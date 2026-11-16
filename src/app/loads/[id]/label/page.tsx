@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
+import { formatCaseLotNumber } from "@/lib/case-lots/history";
 import { labelNumber, labelPowder } from "@/lib/label-format";
 import { PrintButton } from "@/components/ui/PrintButton";
 
@@ -15,7 +16,7 @@ export default async function LoadLabelPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const load = await prisma.load.findUnique({ where: { id }, include: { firearm: true } });
+  const load = await prisma.load.findUnique({ where: { id }, include: { firearm: true, caseLot: true } });
 
   if (!load) notFound();
 
@@ -85,7 +86,8 @@ export default async function LoadLabelPage({
         </div>
         <div className="flex justify-between gap-2">
           <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-            Hülsen: {load.caseBrand ?? "–"}
+            Hülsen: {load.caseLot ? `${formatCaseLotNumber(load.caseLot.number)} ` : ""}
+            {load.caseBrand ?? (load.caseLot ? "" : "–")}
           </span>
           <span className="shrink-0 whitespace-nowrap">Count: {load.caseLoadCount ?? "–"}</span>
         </div>

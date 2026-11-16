@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { csvResponse } from "@/lib/csv-response";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
+import { caseLotLabel } from "@/lib/case-lots/history";
 
 export async function GET() {
   const loads = await prisma.load.findMany({
-    include: { firearm: true },
+    include: { firearm: true, caseLot: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -21,6 +22,7 @@ export async function GET() {
     geschossgewichtGrain: l.bulletWeightGr ?? "",
     oalMm: l.oalMm ?? "",
     cbtoMm: l.cbtoMm ?? "",
+    huelseCharge: l.caseLot ? caseLotLabel(l.caseLot) : "",
     huelseMarke: l.caseBrand ?? "",
     huelseAnzahl: l.caseQuantity ?? "",
     huelseLoadCount: l.caseLoadCount ?? "",

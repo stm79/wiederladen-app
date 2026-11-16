@@ -7,6 +7,7 @@ import { inputClass } from "@/components/forms/FormField";
 import { UnitValueDisplay } from "@/components/units/UnitValueDisplay";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
 import { loadDisplayName } from "@/lib/loads/label";
+import { formatCaseLotNumber } from "@/lib/case-lots/history";
 
 export const dynamic = "force-dynamic";
 
@@ -75,10 +76,10 @@ function SortableHeader({
 }
 
 function matchesQuery(
-  load: { label: string; firearmName: string; powder: string | null; bullet: string | null; primer: string | null; number: string },
+  load: { label: string; firearmName: string; powder: string | null; bullet: string | null; primer: string | null; number: string; lot: string | null },
   q: string
 ): boolean {
-  const haystack = [load.label, load.firearmName, load.powder, load.bullet, load.primer, load.number]
+  const haystack = [load.label, load.firearmName, load.powder, load.bullet, load.primer, load.number, load.lot]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
@@ -100,7 +101,7 @@ export default async function LoadsPage({
   const query = (params.q ?? "").trim();
 
   const loadsRaw = await prisma.load.findMany({
-    include: { firearm: true },
+    include: { firearm: true, caseLot: { select: { number: true } } },
   });
 
   const loads = loadsRaw
@@ -114,6 +115,7 @@ export default async function LoadsPage({
       }),
       firearmName: load.firearm.name,
       number: formatLoadNumber(load.loadNumber, load.variantLetter),
+      lot: load.caseLot ? formatCaseLotNumber(load.caseLot.number) : null,
     }))
     .filter((load) => !query || matchesQuery(load, query))
     .sort((a, b) => (dir === "desc" ? -1 : 1) * compareLoads(a, b, sort));
@@ -158,7 +160,7 @@ export default async function LoadsPage({
               type="search"
               name="q"
               defaultValue={query}
-              placeholder="Suchen: Nummer, Pulver, Geschoss, Waffe…"
+              placeholder="Suchen: Nummer, Pulver, Geschoss, Waffe, L-01…"
               className={`${inputClass} pl-9`}
               aria-label="Ladedaten durchsuchen"
             />

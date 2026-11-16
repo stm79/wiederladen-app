@@ -20,6 +20,8 @@ export interface LoadReportData {
   bulletWeightGr: number | null;
   oalMm: number | null;
   cbtoMm: number | null;
+  /** e.g. "L-03 · Lapua Match 2025" */
+  caseLot: string | null;
   caseBrand: string | null;
   caseQuantity: number | null;
   caseLoadCount: number | null;
@@ -71,6 +73,7 @@ export function LoadReportDocument({ load, prefs }: { load: LoadReportData; pref
         <Row label="Zündhütchen" value={load.primer ?? "—"} />
 
         <Text style={s.sectionTitle}>Hülse</Text>
+        <Row label="Hülsen-Charge" value={load.caseLot ?? "—"} />
         <Row label="Hülsen-Marke" value={load.caseBrand ?? "—"} />
         <Row label="Anzahl (Stück)" value={load.caseQuantity != null ? String(load.caseQuantity) : "—"} />
         <Row label="Load Count" value={load.caseLoadCount != null ? String(load.caseLoadCount) : "—"} />

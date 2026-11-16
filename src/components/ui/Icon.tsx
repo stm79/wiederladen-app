@@ -34,6 +34,8 @@ const PATHS = {
   gauge: "M12 14l4-4M3.3 19a10 10 0 1 1 17.4 0",
   droplet: "M12 2.7s6 6.3 6 11.3a6 6 0 1 1-12 0c0-5 6-11.3 6-11.3z",
   checklist: "M10 6h11M10 12h11M10 18h11M3 6l1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17",
+  /** Rifle case: body, shoulder, neck, rim. */
+  cartridge: "M10 3h4v4l2 3v10H8V10l2-3zM7 21h10M8 17h8",
 } as const;
 
 export type IconName = keyof typeof PATHS;

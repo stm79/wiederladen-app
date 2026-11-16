@@ -31,6 +31,7 @@ export async function createLoad(input: LoadInput): Promise<LoadActionResult> {
   try {
     const load = await prisma.load.create({ data });
     revalidatePath("/loads");
+    revalidatePath("/cases", "layout");
     return { ok: true, load };
   } catch (error) {
     return { ok: false, error: friendlyError(error) };
@@ -49,6 +50,7 @@ export async function updateLoad(id: string, input: LoadInput): Promise<LoadActi
     const load = await prisma.load.update({ where: { id }, data });
     revalidatePath("/loads");
     revalidatePath(`/loads/${id}`);
+    revalidatePath("/cases", "layout");
     return { ok: true, load };
   } catch (error) {
     return { ok: false, error: friendlyError(error) };
@@ -92,8 +94,14 @@ export async function cloneLoad(id: string, mode: CloneMode): Promise<LoadAction
         variantLetter,
         name: source.name ? `${source.name} (Kopie)` : null,
         firearmId: source.firearmId,
+        caseLotId: source.caseLotId,
         caseBrand: source.caseBrand,
-        caseLoadCount: source.caseLoadCount,
+        // A variant is the same loading cycle; a new load from the same cases
+        // is their next reload.
+        caseLoadCount:
+          mode === "new" && source.caseLotId && source.caseLoadCount != null
+            ? source.caseLoadCount + 1
+            : source.caseLoadCount,
         sizingDie: source.sizingDie,
         shoulderBumpMm: source.shoulderBumpMm,
         bushingDiameterMm: source.bushingDiameterMm,
@@ -112,6 +120,7 @@ export async function cloneLoad(id: string, mode: CloneMode): Promise<LoadAction
       },
     });
     revalidatePath("/loads");
+    revalidatePath("/cases", "layout");
     return { ok: true, load: copy };
   } catch (error) {
     return { ok: false, error: friendlyError(error) };

@@ -10,6 +10,7 @@ const NAV_ITEMS: { href: string; label: string; short?: string; icon: IconName }
   { href: "/loads", label: "Ladedaten", icon: "flask" },
   { href: "/sessions", label: "Sessions", icon: "calendar" },
   { href: "/firearms", label: "Waffen", icon: "crosshair" },
+  { href: "/cases", label: "Hülsen", icon: "cartridge" },
   { href: "/compare", label: "Vergleich", icon: "chart" },
 ];
 

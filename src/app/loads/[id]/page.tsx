@@ -13,6 +13,8 @@ import { getDistinctLoadFieldValues } from "@/lib/loads/distinct-values";
 import { formatLoadNumber } from "@/lib/loads/variant-letter";
 import { loadDisplayName } from "@/lib/loads/label";
 import { formatDate } from "@/lib/format-date";
+import { getCaseLotOptions } from "@/lib/case-lots/options";
+import { caseLotLabel } from "@/lib/case-lots/history";
 
 export default async function LoadDetailPage({
   params,
@@ -20,11 +22,12 @@ export default async function LoadDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [load, firearms, known, checklistSteps] = await Promise.all([
+  const [load, firearms, known, checklistSteps, caseLots] = await Promise.all([
     prisma.load.findUnique({
       where: { id },
       include: {
         firearm: true,
+        caseLot: { select: { id: true, number: true, name: true } },
         parentLoad: { include: { firearm: { select: { caliber: true } } } },
         variants: { orderBy: { createdAt: "desc" }, include: { firearm: { select: { caliber: true } } } },
         shotGroups: { include: { session: true }, orderBy: { createdAt: "desc" } },
@@ -34,11 +37,12 @@ export default async function LoadDetailPage({
     prisma.firearm.findMany({ orderBy: { name: "asc" } }),
     getDistinctLoadFieldValues(),
     prisma.checklistStep.findMany({ orderBy: { sortOrder: "asc" } }),
+    getCaseLotOptions(),
   ]);
 
   if (!load) notFound();
 
-  const { firearm, ...loadFields } = load;
+  const { firearm, caseLot, ...loadFields } = load;
 
   return (
     <div className="flex flex-col gap-6">
@@ -58,6 +62,15 @@ export default async function LoadDetailPage({
                 <Link href={`/loads/${load.parentLoad.id}`} className="hover:text-neutral-900 hover:underline dark:hover:text-white">
                   {formatLoadNumber(load.parentLoad.loadNumber, load.parentLoad.variantLetter)}
                 </Link>
+              </>
+            )}
+            {caseLot && (
+              <>
+                {" · Hülsen "}
+                <Link href={`/cases/${caseLot.id}`} className="hover:text-neutral-900 hover:underline dark:hover:text-white">
+                  {caseLotLabel(caseLot)}
+                </Link>
+                {load.caseLoadCount != null && ` (${load.caseLoadCount}×)`}
               </>
             )}
           </>
@@ -99,6 +112,7 @@ export default async function LoadDetailPage({
             knownPrimers={known.primers}
             knownSizingDies={known.sizingDies}
             knownSeatingDies={known.seatingDies}
+            caseLots={caseLots}
           />
         </div>
 

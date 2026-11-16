@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getUnitPreferences } from "@/lib/settings";
 import { buildComparisonRow } from "@/lib/comparison/aggregate";
 import { LoadReportDocument } from "@/lib/pdf/load-report";
+import { caseLotLabel } from "@/lib/case-lots/history";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -12,6 +13,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     where: { id },
     include: {
       firearm: true,
+      caseLot: true,
       shotGroups: { include: { velocitySets: { include: { shots: true } } } },
     },
   });
@@ -56,6 +58,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         bulletWeightGr: load.bulletWeightGr,
         oalMm: load.oalMm,
         cbtoMm: load.cbtoMm,
+        caseLot: load.caseLot ? caseLotLabel(load.caseLot) : null,
         caseBrand: load.caseBrand,
         caseQuantity: load.caseQuantity,
         caseLoadCount: load.caseLoadCount,
