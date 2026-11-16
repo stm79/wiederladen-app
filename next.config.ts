@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { version } from "./package.json";
 
 // Behind a reverse proxy on a real domain, Server Actions' built-in CSRF check
 // compares the request's Origin against the Host it sees — set ALLOWED_ORIGIN
@@ -7,6 +8,9 @@ import type { NextConfig } from "next";
 const allowedOrigins = process.env.ALLOWED_ORIGIN?.split(",").map((o) => o.trim()).filter(Boolean);
 
 const nextConfig: NextConfig = {
+  // Shown on the Einstellungen page; package.json is the single place the
+  // version gets bumped.
+  env: { APP_VERSION: version },
   experimental: {
     // Default 1MB is well below a phone camera photo (chrono CSV imports and
     // group-photo uploads both go through Server Actions).

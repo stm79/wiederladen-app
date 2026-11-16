@@ -1,3 +1,3 @@
-// Bumped by hand on every Docker rebuild — not tied to package.json semver
-// conventions, just a simple running build counter for the Einstellungen page.
-export const APP_VERSION = "1.0.25";
+// Comes from package.json via next.config.ts (inlined at build time), so
+// bumping the version there is enough.
+export const APP_VERSION = process.env.APP_VERSION ?? "dev";
